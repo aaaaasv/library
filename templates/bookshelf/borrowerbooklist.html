@@ -6,10 +6,15 @@
             <div class="col text-center">
                 <h4>{{ user }}</h4>
                 <p>Loaned books list({{ books_amount }}):</p>
-                {% for i in books %}
+                {% for i in borrowed_books %}
                     <p>{{ i|title }}</p>
                 {% endfor %}
-
+                <form method="post">
+                    {% csrf_token %}
+                    {% for i in to_borrow %}
+                    <input type="submit" value="Confirm book ({{ i.title|title }}) borrowing">
+                    {% endfor %}
+                </form>
             </div>
         </div>
     </div>

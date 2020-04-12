@@ -73,7 +73,7 @@ class BorrowerDetailView(DetailView):
     #  add "Confirm borrowing" button for this page, add book to user's borrowed book and do minus one to available books
 
     model = User
-    template_name = 'bookshelf/borrower_detail.html'
+    template_name = 'bookshelf/borrowerbooklist.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -85,6 +85,15 @@ class BorrowerDetailView(DetailView):
     # def get_object(self):
     #     return self.request.user
 
+
+def borrowerbooklist(request, user_id, book_pk):
+    context = {}
+    borrow = User.objects.all().filter(id=user_id)
+    context['borrowed_books'] = Book.objects.all().filter(borrower=borrow[0])
+    context['to_borrow'] = Book.objects.all().filter(pk=book_pk).values()
+    context['books_amount'] = len(Book.objects.all().filter(borrower=borrow[0]))
+
+    return render(request, 'bookshelf/borrowerbooklist.html', context)
 
 class BookBorrow(DetailView):
     # model = user
@@ -109,21 +118,17 @@ def bookborrow_getcardnumber(request, book_pk):
         if form.is_valid():
             card_number = form.cleaned_data['card_number']
             borrower_profile = Profile.objects.all().filter(card_number=card_number).values()
-            print(borrower_profile)
-            # TODO: Change id here for pk or smth for detail borrowed books view
             borrower_user = User.objects.all().filter(profile=borrower_profile[0]['id']).values()
             if len(card_number) != 9:
                 show_error_message(request)
                 return redirect('/')
-            else: # Card number is inputted correctly
-                try: # check if there is a user with inputted card number
-                    print(borrower_user)
-                    return redirect('borrower_detail', id=borrower_user[0]['pk'])
+            else:  # Card number is inputted correctly
+                try:  # check if there is a user with inputted card number
+                    return redirect('borrower_detail', user_id=borrower_user[0]['id'], book_pk=book_pk)
                 except IndexError:
                     show_error_message(request)
+    else:
+        form = BorrowerCardNumberForm()
 
-else:
-form = BorrowerCardNumberForm()
-
-context['form'] = form
-return render(request, 'bookshelf/bookborrow_getcardnumber.html', context)
+    context['form'] = form
+    return render(request, 'bookshelf/bookborrow_getcardnumber.html', context)
