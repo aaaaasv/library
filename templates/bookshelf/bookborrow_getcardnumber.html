@@ -1,0 +1,26 @@
+{% extends 'bookshelf/base.html' %}
+
+{% block content %}
+    <style>
+    body, html {
+        height:100%;
+    }
+    .nav {
+        position:absolute;
+    }
+    </style>
+    <div class="container h-100">
+        <div class="h-100 row align-items-center">
+            <div class="col text-center" style="font-size:1.5rem">
+                {% for i in borrow_book %}
+                    <span>Book </span><span style="font-weight:bold;">{{ i.title|title }}</span>
+                {% endfor %}
+            <form method="get">
+                {% csrf_token %}
+                {{ form.card_number }}
+                <input type="submit" value="Borrow this book to user"/>
+            </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

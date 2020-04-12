@@ -1,0 +1,31 @@
+{% extends 'bookshelf/base.html' %}
+
+{% block content %}
+    <style>
+     li {
+         list-style-type:none;
+     }
+    </style>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="card text-center">
+                        <div class="card-body">
+
+                            {{ form.as_p }}
+
+                            <input type="submit" value="Save" class="card-link">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+{% endblock %}

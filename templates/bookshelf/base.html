@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load filters %}
+
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <style>
+        a, a:hover, a:focus, a:active {
+            text-decoration: none;
+            color: inherit;
+        }
+
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+    <a class="navbar-brand" href="#">LIBRARY</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+
+{#                TODO: Work on design of this error message    #}
+                {% if messages %}
+                        {% for message in messages %}
+                            <span> {% if message.tags %} <span class="{{ message.tags }}"> </span> {% endif %} {{ message }} </span>
+                        {% endfor %}
+                {% endif %}
+
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    Link
+                </a>
+            </li>
+
+
+        </ul>
+        <button class="btn btn-outline-info my-3 my-sm-0"><a href="{% url 'index' %}">Show all books</a></button>
+        <form method="get" class="form-inline my-2 my-lg-0">
+            <select name="filterstatus" aria-labelledby="navbarDropdown">
+                <option value="" disabled selected>Filter Book Status</option>
+                <option value='A'
+                        style="background-color:transparent; border:none; cursor:pointer" ; color:black;
+                        class="filter-button">Available
+                </option>
+                <option value='L'
+                        style="background-color:transparent; border:none; cursor:pointer; color:black"
+                        class=" filter-button">Borrowed
+                </option>
+            </select>
+            <input class="form-control mr-sm-2 searchfield" id="searchbox" name="search" type="search"
+                   value="{{ request.GET.searchit }}" placeholder="Search" aria-label="Search"/>
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+    </div>
+</nav>
+{% block content %}
+{% endblock %}
+
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+</body>
+</html>

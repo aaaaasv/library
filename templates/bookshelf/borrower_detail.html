@@ -1,0 +1,16 @@
+{% extends 'bookshelf/base.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col text-center">
+                <h4>{{ user }}</h4>
+                <p>Loaned books list({{ books_amount }}):</p>
+                {% for i in books %}
+                    <p>{{ i|title }}</p>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

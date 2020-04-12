@@ -1,0 +1,27 @@
+{% extends 'bookshelf/base.html' %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="card text-center">
+                        <div class="card-body">
+
+                            <p>Are you sure you want to delete {{ object|title }}?</p>
+
+                            <input type="submit" value="Confirm" class="card-link">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+{% endblock %}

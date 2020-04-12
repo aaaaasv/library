@@ -1,0 +1,11 @@
+{% extends 'bookshelf/base.html' %}
+
+{% block content %}
+    <h1>{{ book|title }}</h1>
+    <p>borowers:</p>
+    {% for i in book.borrower.all %}
+{#    {{ book.borrower.all }}#}
+
+        <p>{{ i }}</p>
+    {% endfor %}
+{% endblock %}

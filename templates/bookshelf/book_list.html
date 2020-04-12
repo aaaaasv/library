@@ -1,0 +1,95 @@
+{% extends 'bookshelf/base.html' %}
+{% block title %} Library {% endblock %}
+{% block content %}
+    {% load filters %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static "bookshelf/styles/book_list.css" %}" type="text/css">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                        <th scope="col">#</th>
+                        <th scope="col">Cover</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Author</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Shelf</th>
+                        <th scope="col"></th>
+                        </thead>
+                        {% for book in object_list %}
+                            <tr>
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td><img src="{{ book.cover }}" alt="" style="max-width:8em; cursor:pointer"></td>
+                                {% if book.type == 'paperback' %}
+                                    <td>
+                                        <img
+                                                src="https://image.flaticon.com/icons/png/512/166/166088.png"
+                                                alt="Paperback"
+                                                style="max-width:1.5em"
+                                                title="Paperback">
+                                        {{ book.title|title }}</td>
+                                {% else %}
+                                    <td>{{ book.title|title }}</td>
+                                {% endif %}
+                                <td>{{ book.author.first_name|title }} {{ book.author.last_name|title }}</td>
+                                <td style="color:{{ book.status|get_status_color }}">
+                                    {{ book.get_status_display }}
+                                    {% if book.status == 'A' %}
+                                        ({{ book.current_amount }}/{{ book.total_amount }})
+                                    {% endif %}
+                                </td>
+                                <td>None</td>
+                                <td>
+
+                                    {#                                Button block                                 #}
+
+                                    {% if request.user|has_group:"Librarian" %}
+                                        <div class="btn-group-vertical" role="group" aria-label="Management Panel">
+                                            <a type="button" class="btn btn-success"
+                                               href="{% url 'book_update' pk=book.pk %}">Edit</a>
+                                            <a type="button" class="btn btn-danger"
+                                               href="{% url 'book_delete' pk=book.pk %}">Remove</a>
+                                            <a href="{% url 'book_borrow' book_pk=book.pk %}" type="button"
+                                               class="btn btn-info">
+                                                {% if book.current_amount > 0 %}
+                                                    Borrow
+                                                {% else %}
+                                                    Reserve
+                                                {% endif %}
+                                            </a>
+                                            {% if book.current_amount != book.total_amount %}
+                                                <button type="button" class="btn btn-4">Return</button>
+                                            {% else %}
+                                                <button type="button" class="btn btn-4 disabled"
+                                                        style="cursor:not-allowed;">Return
+                                                </button>
+                                            {% endif %}
+                                            <a type="button" class="btn btn-4"
+                                               href="{% url 'borrowers_detail' pk=book.pk %}">See Debtors</a>
+                                        </div>
+                                        </td>
+                                        </tr>
+                                    {% endif %}
+                        {% empty %}
+                            <p>There are no books yet.</p>
+
+                        {% endfor %}
+
+
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% if request.user|has_group:"Librarian" %}
+            <div class="row">
+                <div class="col-sm-12 text-center">
+                    <a type="button" class="btn btn-success" href="{% url 'book_create' %}">Add book</a>
+                    <button type="button" class="btn btn-success">Create new shelf</button>
+                </div>
+
+            </div>
+            </div>
+        {% endif %}
+{% endblock %}
