@@ -6,6 +6,7 @@
          list-style-type:none;
      }
     </style>
+{#    TODO: Update books form now is not working (only names of fields are showing)    #}
     <div class="container">
         <div class="row">
             <div class="col-sm-12">
@@ -13,9 +14,8 @@
                     {% csrf_token %}
                     <div class="card text-center">
                         <div class="card-body">
-
                             {% for field in form.fields %}
-                            {{ field }}
+                                {{ field }}
                             {% endfor %}
                             <input type="submit" value="Update" class="card-link">
                         </div>

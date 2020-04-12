@@ -81,8 +81,15 @@ def borrowerbooklist(request, user_id, book_pk):
         if books_amount > 5:
             show_error_message(request, "Book limit reached (>5)")
         else:
+            # TODO: minus one from current books (total books - borrower books amount)
             b.borrower.add(u)
-            Book.approve_book_amount(books_amount)
+
+            boooks = Book.objects.get(pk=book_pk)
+            amount_of_borrowers = boooks.borrower.all().count()
+            total_amount_books = Book.objects.all().filter(pk=book_pk).values()[0]['total_amount']
+            b = Book.objects.get(pk=book_pk)
+            b.current_amount = total_amount_books - amount_of_borrowers
+            b.save()
         return redirect('/')
     else:
         return render(request, 'bookshelf/borrowerbooklist.html', context)
