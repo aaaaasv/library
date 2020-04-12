@@ -66,34 +66,27 @@ class BookBorrowersDetailView(DetailView):
     template_name = 'bookshelf/borrowers_detail.html'
 
 
-class BorrowerDetailView(DetailView):
-    # TODO: the problem is in that the user's model has no pk and 'detailview' generic view ONLY can "create" page with pk (or slug),
-    #  so i cant use id for this purposes (profile model has no pk too)
-    #  after solving this problem and creating page, where all the books that user borrowed are shown
-    #  add "Confirm borrowing" button for this page, add book to user's borrowed book and do minus one to available books
-
-    model = User
-    template_name = 'bookshelf/borrowerbooklist.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        borrower_book_list = Book.objects.all().filter(borrower=self.object)
-        context['books'] = borrower_book_list
-        context['books_amount'] = len(borrower_book_list)
-        return context
-
-    # def get_object(self):
-    #     return self.request.user
-
-
 def borrowerbooklist(request, user_id, book_pk):
     context = {}
     borrow = User.objects.all().filter(id=user_id)
+    context['borrower'] = borrow.values()
     context['borrowed_books'] = Book.objects.all().filter(borrower=borrow[0])
     context['to_borrow'] = Book.objects.all().filter(pk=book_pk).values()
-    context['books_amount'] = len(Book.objects.all().filter(borrower=borrow[0]))
+    books_amount = len(Book.objects.all().filter(borrower=borrow[0]))
+    context['books_amount'] = books_amount
 
-    return render(request, 'bookshelf/borrowerbooklist.html', context)
+    if request.method == "POST":
+        b = Book.objects.get(pk=book_pk)
+        u = User.objects.get(id=user_id)
+        if books_amount > 5:
+            show_error_message(request, "Book limit reached (>5)")
+        else:
+            b.borrower.add(u)
+            Book.approve_book_amount(books_amount)
+        return redirect('/')
+    else:
+        return render(request, 'bookshelf/borrowerbooklist.html', context)
+
 
 class BookBorrow(DetailView):
     # model = user
@@ -106,8 +99,8 @@ class BookBorrow(DetailView):
 from django.contrib import messages
 
 
-def show_error_message(request):
-    messages.info(request, 'Inputted card number is not correct. Try again.')
+def show_error_message(request, message):
+    messages.info(request, message)
 
 
 def bookborrow_getcardnumber(request, book_pk):
@@ -119,8 +112,9 @@ def bookborrow_getcardnumber(request, book_pk):
             card_number = form.cleaned_data['card_number']
             borrower_profile = Profile.objects.all().filter(card_number=card_number).values()
             borrower_user = User.objects.all().filter(profile=borrower_profile[0]['id']).values()
+            print(borrower_user[0]['id'])
             if len(card_number) != 9:
-                show_error_message(request)
+                show_error_message(request, 'Inputted card number is not correct. Try again.')
                 return redirect('/')
             else:  # Card number is inputted correctly
                 try:  # check if there is a user with inputted card number

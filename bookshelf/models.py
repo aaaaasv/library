@@ -41,6 +41,7 @@ class Book(models.Model):
         choices=STATUS_CHOICES,
         default='A',
     )
+    borrower = models.ManyToManyField(User, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         """
@@ -60,9 +61,16 @@ class Book(models.Model):
 
         if self.current_amount < 0:
             self.current_amount = 0
+
         super().save(*args, **kwargs)
 
-    borrower = models.ManyToManyField(User, null=True, blank=True)
+    def approve_book_amount(self, borrowers_count):
+        """
+        When someone borrows a book (or returns it), change its available amount
+        :return:
+        """
+        print(borrowers_count)
+        # super().save(*args, **kwargs)
 
     def __str__(self):
         return ("%s %s. %s" % (self.title, self.author.first_name[:1], self.author.last_name))

@@ -1,19 +1,25 @@
 {% extends 'bookshelf/base.html' %}
 
 {% block content %}
+    {% load filters %}
+
     <div class="container">
         <div class="row align-items-center">
             <div class="col text-center">
-                <h4>{{ user }}</h4>
+                {% for i in borrower %}
+                    <h4>{{ i.username }}</h4>
+                {% endfor %}
                 <p>Loaned books list({{ books_amount }}):</p>
                 {% for i in borrowed_books %}
                     <p>{{ i|title }}</p>
                 {% endfor %}
-                <form method="post">
+                {% if user|has_group:"Librarian" %}
+                    <form method="post">
                     {% csrf_token %}
                     {% for i in to_borrow %}
-                    <input type="submit" value="Confirm book ({{ i.title|title }}) borrowing">
+                        <input type="submit" value="Confirm book ({{ i.title|title }}) borrowing">
                     {% endfor %}
+                {% endif %}
                 </form>
             </div>
         </div>

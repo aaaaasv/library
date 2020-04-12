@@ -1,13 +1,16 @@
 {% extends 'bookshelf/base.html' %}
 
 {% block content %}
+    {% load filters %}
+
     <style>
-    body, html {
-        height:100%;
-    }
-    .nav {
-        position:absolute;
-    }
+        body, html {
+            height: 100%;
+        }
+
+        .nav {
+            position: absolute;
+        }
     </style>
     <div class="container h-100">
         <div class="h-100 row align-items-center">
@@ -15,11 +18,16 @@
                 {% for i in borrow_book %}
                     <span>Book </span><span style="font-weight:bold;">{{ i.title|title }}</span>
                 {% endfor %}
-            <form method="get">
-                {% csrf_token %}
-                {{ form.card_number }}
-                <input type="submit" value="Borrow this book to user"/>
-            </form>
+                {% if user|has_group:"Librarian" %}
+
+                    <form method="get">
+                        {% csrf_token %}
+                        {{ form.card_number }}
+                        <input type="submit" value="Borrow this book to user"/>
+                    </form>
+                    {% else %}
+                    <p>Sorry, but you don't have permission to borrow book by yourself :c</p>
+                {% endif %}
             </div>
         </div>
     </div>
