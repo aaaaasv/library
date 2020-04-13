@@ -7,10 +7,11 @@ urlpatterns = [
     path('book/create', BookCreate.as_view(), name='book_create'),
     path('book/<int:pk>/delete', BookDelete.as_view(), name='book_delete'),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/signup/', signup, name='signup'),
     path('book/borrowers/<int:pk>/', BookBorrowersDetailView.as_view(), name='borrowers_detail'),
     # path('borrowerbooks/<int:pk>/', BorrowerDetailView.as_view(), name='borrower_detail'),
-    path('borrow_book/<int:book_pk>/', bookborrow_getcardnumber, name='book_borrow'),
-    path('borrowerbooks/<int:user_id>/<int:book_pk>/', borrowerbooklist, name='borrower_detail'),
+    path('<int:book_pk>/<str:type>/', bookborrow_getcardnumber, name='book_borrow'),
+    path('borrowerbooks/<int:user_id>/<str:type>/<int:book_pk>/', borrowerbooklist, name='borrower_detail'),
     # path('user/<int:user_pk>/borrow_book/<int:book_pk>', BookBorrow.as_view(), name='book_borrow')
 ]
 

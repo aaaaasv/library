@@ -21,6 +21,9 @@ class Book(models.Model):
     cover = models.CharField(max_length=200)
     total_amount = models.IntegerField(default=1)
     current_amount = models.IntegerField(default=1)
+
+    reserved_amount = models.IntegerField(default=0)
+
     ISBN = models.CharField(max_length=13, default='0000000000000')
 
     TYPE_CHOICES = [
@@ -41,7 +44,9 @@ class Book(models.Model):
         choices=STATUS_CHOICES,
         default='A',
     )
-    borrower = models.ManyToManyField(User, null=True, blank=True)
+
+    borrower = models.ManyToManyField(User, blank=True, related_name='borrowerOfBook')
+    reserver = models.ManyToManyField(User, blank=True, related_name='reserverOfBook')
 
     def save(self, *args, **kwargs):
         """
@@ -51,9 +56,26 @@ class Book(models.Model):
         :param kwargs:
         :return:
         """
+
+
         if self.current_amount == 0:
             self.status = 'L'
         else:
+            reserved_amount = self.reserver.all().count()
+            if reserved_amount > 0:
+                # TODO: 3 reserved books per user and 3 reservations per book is maximum
+                for i in self.reserver.all():
+                    print(i)
+                enough_list = self.reserver.all()[:self.current_amount] # slice so that all users will get reserved book and current amount wont be < 0
+                for reserver_user in enough_list:
+                    self.borrower.add(reserver_user) # set user who is now reserver to borrower
+                    self.reserver.remove(reserver_user) # remove user from reserver (because moved to borrower)
+                super().save(*args, **kwargs)
+                self.current_amount -= reserved_amount
+                self.reserved_amount -= reserved_amount
+            if self.current_amount == 0:
+                self.status = 'L'
+
             self.status = 'A'
 
         if self.current_amount > self.total_amount:
@@ -64,21 +86,25 @@ class Book(models.Model):
 
         super().save(*args, **kwargs)
 
-    def approve_book_amount(self, borrowers_count):
-        """
-        When someone borrows a book (or returns it), change its available amount
-        :return:
-        """
-        print(borrowers_count)
-        # super().save(*args, **kwargs)
-
     def __str__(self):
         return ("%s %s. %s" % (self.title, self.author.first_name[:1], self.author.last_name))
 
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    card_number = models.CharField(max_length=13, default='00000000')
+    card_number = models.CharField(max_length=13, default='000000000')
+
+    def save(self, *args, **kwargs):
+        """
+        set right card number
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        card_n = ('0' * (9 - len(str(self.id)))) + str(self.id)
+        self.card_number = card_n
+
+        super().save(*args, **kwargs)
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):

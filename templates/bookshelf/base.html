@@ -18,7 +18,7 @@
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
-    <a class="navbar-brand" href="#">LIBRARY</a>
+    <a class="navbar-brand" href="{% url 'index' %}">LIBRARY</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -27,21 +27,40 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item active">
-                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                {#                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>#}
 
-{#                TODO: Work on design of this error message    #}
+                {#                TODO: Work on design of this error message    #}
                 {% if messages %}
-                        {% for message in messages %}
-                            <span> {% if message.tags %} <span class="{{ message.tags }}"> </span> {% endif %} {{ message }} </span>
-                        {% endfor %}
+                    {% for message in messages %}
+                        <span> {% if message.tags %} <span class="{{ message.tags }}"> </span> {% endif %} {{ message }} </span>
+                    {% endfor %}
                 {% endif %}
 
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">
-                    Link
-                </a>
-            </li>
+
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        {{ user }} {{ user.profile.card_number }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url "logout" %}">
+                        Log out
+                    </a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url "signup" %}">
+                        Sign up
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url "login" %}">
+                        Log in
+                    </a>
+                </li>
+            {% endif %}
 
 
         </ul>

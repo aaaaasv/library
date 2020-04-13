@@ -7,6 +7,8 @@ from django.views.generic.detail import DetailView
 from django.urls import reverse
 from django.db.models import Q
 from django.contrib.auth.models import User
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import UserCreationForm
 
 from .models import Book, Profile
 from .forms import BookEdit, BorrowerCardNumberForm
@@ -66,33 +68,57 @@ class BookBorrowersDetailView(DetailView):
     template_name = 'bookshelf/borrowers_detail.html'
 
 
-def borrowerbooklist(request, user_id, book_pk):
+def borrowerbooklist(request, user_id, book_pk, type):
     context = {}
-    borrow = User.objects.all().filter(id=user_id)
-    context['borrower'] = borrow.values()
-    context['borrowed_books'] = Book.objects.all().filter(borrower=borrow[0])
-    context['to_borrow'] = Book.objects.all().filter(pk=book_pk).values()
-    books_amount = len(Book.objects.all().filter(borrower=borrow[0]))
-    context['books_amount'] = books_amount
+    if type == 'borrow':
+        borrow = User.objects.all().filter(id=user_id)
+        context['borrower'] = borrow.values()
+        context['borrowed_books'] = Book.objects.all().filter(borrower=borrow[0])
+        context['to_borrow'] = Book.objects.all().filter(pk=book_pk).values()
+        books_amount = len(Book.objects.all().filter(borrower=borrow[0]))
+        context['books_amount'] = books_amount
 
-    if request.method == "POST":
-        b = Book.objects.get(pk=book_pk)
-        u = User.objects.get(id=user_id)
-        if books_amount > 5:
-            show_error_message(request, "Book limit reached (>5)")
-        else:
-            # TODO: minus one from current books (total books - borrower books amount)
-            b.borrower.add(u)
-
-            boooks = Book.objects.get(pk=book_pk)
-            amount_of_borrowers = boooks.borrower.all().count()
-            total_amount_books = Book.objects.all().filter(pk=book_pk).values()[0]['total_amount']
+        if request.method == "POST":
             b = Book.objects.get(pk=book_pk)
-            b.current_amount = total_amount_books - amount_of_borrowers
-            b.save()
-        return redirect('/')
-    else:
-        return render(request, 'bookshelf/borrowerbooklist.html', context)
+            u = User.objects.get(id=user_id)
+            if books_amount >= 5:
+                show_error_message(request, "Book limit reached (>5)")
+            else:
+                b.borrower.add(u)
+
+                boooks = Book.objects.get(pk=book_pk)
+                amount_of_borrowers = boooks.borrower.all().count()
+                total_amount_books = Book.objects.all().filter(pk=book_pk).values()[0]['total_amount']
+                b = Book.objects.get(pk=book_pk)
+                b.current_amount = total_amount_books - amount_of_borrowers
+                b.save()
+            return redirect('/')
+        else:
+            return render(request, 'bookshelf/borrowerbooklist.html', context)
+
+    elif type == 'reserve':
+        reserve = User.objects.all().filter(id=user_id)
+        context['reserver'] = reserve.values()
+        context['reserved_books'] = Book.objects.all().filter(reserver=reserve[0])
+        context['to_reserve'] = Book.objects.all().filter(pk=book_pk).values()
+        books_amount = len(Book.objects.all().filter(reserver=reserve[0]))
+        context['books_amount'] = books_amount
+
+        book_reservers_amount = Book.objects.get(pk=book_pk).reserver.all().count()
+        print(book_reservers_amount)
+
+        if request.method == "POST":
+            b = Book.objects.get(pk=book_pk)
+            u = User.objects.get(id=user_id)
+            if books_amount >= 3:
+                show_error_message(request, "Reserved books limit reached (>3)")
+            elif book_reservers_amount >= 3:
+                show_error_message(request, "The book cannot have more than 3 reservation")
+            else:
+                b.reserver.add(u)
+            return redirect('/')
+        else:
+            return render(request, 'bookshelf/reserverbooklist.html', context)
 
 
 class BookBorrow(DetailView):
@@ -110,9 +136,10 @@ def show_error_message(request, message):
     messages.info(request, message)
 
 
-def bookborrow_getcardnumber(request, book_pk):
+def bookborrow_getcardnumber(request, book_pk, type):
     context = {}
     context['borrow_book'] = Book.objects.all().filter(pk=book_pk).values()
+    context['type'] = type
     if request.method == "GET":
         form = BorrowerCardNumberForm(request.GET)
         if form.is_valid():
@@ -125,7 +152,7 @@ def bookborrow_getcardnumber(request, book_pk):
                 return redirect('/')
             else:  # Card number is inputted correctly
                 try:  # check if there is a user with inputted card number
-                    return redirect('borrower_detail', user_id=borrower_user[0]['id'], book_pk=book_pk)
+                    return redirect('borrower_detail', user_id=borrower_user[0]['id'], book_pk=book_pk, type=type)
                 except IndexError:
                     show_error_message(request)
     else:
@@ -133,3 +160,18 @@ def bookborrow_getcardnumber(request, book_pk):
 
     context['form'] = form
     return render(request, 'bookshelf/bookborrow_getcardnumber.html', context)
+
+
+def signup(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('/')
+    else:
+        form = UserCreationForm()
+    return render(request, 'registration/signup.html', {'form': form})

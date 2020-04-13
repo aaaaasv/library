@@ -23,10 +23,10 @@
                     <form method="get">
                         {% csrf_token %}
                         {{ form.card_number }}
-                        <input type="submit" value="Borrow this book to user"/>
+                        <input type="submit" value="{{ type|title }} this book to user"/>
                     </form>
-                    {% else %}
-                    <p>Sorry, but you don't have permission to borrow book by yourself :c</p>
+                {% else %}
+                    <p>Sorry, but you don't have permission to {{ type }} book by yourself :c</p>
                 {% endif %}
             </div>
         </div>

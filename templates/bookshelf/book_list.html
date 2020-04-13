@@ -15,13 +15,14 @@
                         <th scope="col">Title</th>
                         <th scope="col">Author</th>
                         <th scope="col">Status</th>
-                        <th scope="col">Shelf</th>
+{#                        <th scope="col">Shelf</th>#}
                         <th scope="col"></th>
                         </thead>
                         {% for book in object_list %}
                             <tr>
                                 <th scope="row">{{ forloop.counter }}</th>
-                                <td><img src="{{ book.cover }}" alt="" style="max-width:8em; cursor:pointer"></td>
+                                <td><img src="{{ book.cover }}" alt=""
+                                         style="max-width:8em; cursor:pointer"></td>
                                 {% if book.type == 'paperback' %}
                                     <td>
                                         <img
@@ -40,7 +41,7 @@
                                         ({{ book.current_amount }}/{{ book.total_amount }})
                                     {% endif %}
                                 </td>
-                                <td>None</td>
+{#                                <td>None</td>#}
                                 <td>
 
                                     {#                                Button block                                 #}
@@ -51,13 +52,16 @@
                                                href="{% url 'book_update' pk=book.pk %}">Edit</a>
                                             <a type="button" class="btn btn-danger"
                                                href="{% url 'book_delete' pk=book.pk %}">Remove</a>
-                                            <a href="{% url 'book_borrow' book_pk=book.pk %}" type="button"
-                                               class="btn btn-info">
-                                                {% if book.current_amount > 0 %}
-                                                    Borrow
-                                                {% else %}
-                                                    Reserve
-                                                {% endif %}
+
+                                            {% if book.current_amount > 0 %}
+                                                <a href="{% url 'book_borrow' book_pk=book.pk type='borrow' %}" type="button"
+                                                   class="btn btn-info">
+                                                Borrow
+                                            {% else %}
+                                                <a href="{% url 'book_borrow' book_pk=book.pk type='reserve' %}" type="button"
+                                                   class="btn btn-info">
+                                                Reserve
+                                            {% endif %}
                                             </a>
                                             {% if book.current_amount != book.total_amount %}
                                                 <button type="button" class="btn btn-4">Return</button>
@@ -86,7 +90,7 @@
             <div class="row">
                 <div class="col-sm-12 text-center">
                     <a type="button" class="btn btn-success" href="{% url 'book_create' %}">Add book</a>
-                    <button type="button" class="btn btn-success">Create new shelf</button>
+{#                    <button type="button" class="btn btn-success">Create new shelf</button>#}
                 </div>
 
             </div>
