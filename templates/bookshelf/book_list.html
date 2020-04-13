@@ -3,7 +3,7 @@
 {% block search %}
     <button class="btn btn-outline-info my-3 my-sm-0"><a href="{% url 'index' %}">Show all books</a></button>
     <form method="get" class="form-inline my-2 my-lg-0">
-        <select name="filterstatus" aria-labelledby="navbarDropdown">
+        <select name="filterstatus" aria-labelledby="navbarDropdown" class="btn btn-outline-info">
             <option value="" disabled selected>Filter Book Status</option>
             <option value='A'
                     style="background-color:transparent; border:none; cursor:pointer" ; color:black;
@@ -108,6 +108,32 @@
                 </div>
             </div>
         </div>
+{#    TODO: Remove pagination when filtering    #}
+    {% if not filtered %}
+        <div class="row my-2">
+            <div class="col-sm-12 text-center">
+                <div class="pagination d-flex flex-column align-items-center">
+            <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a class="btn btn-outline-success" href="?page=1">&laquo; first</a>
+                <a class="btn btn-outline-success" href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+
+                <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+
+                {% if page_obj.has_next %}
+                    <a class="btn btn-outline-success" href="?page={{ page_obj.next_page_number }}">next</a>
+                    <a class="btn btn-outline-success" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                {% endif %}
+            </span>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+
         {% if request.user|has_group:"Librarian" %}
             <div class="row">
                 <div class="col-sm-12 text-center">

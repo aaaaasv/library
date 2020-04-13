@@ -15,6 +15,7 @@ from .forms import BookEdit, BorrowerCardNumberForm
 
 
 class BookListView(ListView):
+    paginate_by = 2 # TODO: Remove if page is filtering now
     model = Book
 
     def get_queryset(self):
@@ -34,10 +35,12 @@ class BookListView(ListView):
             new_context = Book.objects.all()
         if filter_val:
             new_context = new_context.filter(status=filter_val)
+
         return new_context
 
     def get_context_data(self, **kwargs):
         context = super(BookListView, self).get_context_data(**kwargs)
+        # context['filtered'] = True
         context['filter'] = self.request.GET.get('filter', '')
         context['orderby'] = self.request.GET.get('orderby', 'id')
         return context
@@ -108,7 +111,7 @@ def borrowerbooklist(request, user_id, book_pk, type):
 
         if reserve.values()[0] in Book.objects.get(pk=book_pk).borrower.all().values() \
                 or \
-                reserve.values()[0] in Book.objects.get(pk=book_pk).reserver.all().values() :
+                reserve.values()[0] in Book.objects.get(pk=book_pk).reserver.all().values():
             # check if book is not in borrowers (or reservers) already (reserver cannot be borrower at the same time)
             show_error_message(request, "User is already borrowing/reserving this book")
             return redirect('/')
