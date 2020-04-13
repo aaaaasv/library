@@ -4,7 +4,6 @@ from .models import Book, Profile
 
 
 class BookEdit(ModelForm):
-    # TODO: Update book form now is not working
     class Meta:
         model = Book
         fields = '__all__'

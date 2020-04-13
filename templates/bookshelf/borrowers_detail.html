@@ -1,11 +1,40 @@
 {% extends 'bookshelf/base.html' %}
-
+{% block title %} Who borrowed {{ book|title }} {% endblock %}
 {% block content %}
-    <h1>{{ book|title }}</h1>
-    <p>borowers:</p>
-    {% for i in book.borrower.all %}
-{#    {{ book.borrower.all }}#}
+    <div class="container">
+        <div class="row">
+            <div class="col text-center">
 
-        <p>{{ i }}</p>
-    {% endfor %}
+                <h1>{{ book.title|title }} </h1>
+            <h4 class="text-muted">{{ book.author.first_name }} {{ book.author.last_name }}</h4>
+                <h6>borrowers</h6>
+
+                <div class="table-responsive">
+                    <table class="table table-striped border border-info">
+                        <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Username</th>
+                            <th scope="col">First Name</th>
+                            <th scope="col">Last Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Card Number</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in book.borrower.all %}
+                            <tr>
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td>{{ i.username }}</td>
+                                <td>{{ i.first_name }}</td>
+                                <td>{{ i.last_name }}</td>
+                                <td>{{ i.email }}</td>
+                                <td>{{ i.profile.card_number }}</td>
+                            </tr>
+                        {% endfor %}
+
+                        </tbody>
+                </div>
+            </div>
+        </div>
 {% endblock %}

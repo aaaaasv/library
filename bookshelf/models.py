@@ -57,7 +57,7 @@ class Book(models.Model):
         :return:
         """
 
-
+        self.current_amount = self.total_amount - self.borrower.all().count()
         if self.current_amount == 0:
             self.status = 'L'
         else:
@@ -71,12 +71,13 @@ class Book(models.Model):
                     self.borrower.add(reserver_user) # set user who is now reserver to borrower
                     self.reserver.remove(reserver_user) # remove user from reserver (because moved to borrower)
                 super().save(*args, **kwargs)
-                self.current_amount -= reserved_amount
-                self.reserved_amount -= reserved_amount
+                reserved_amount = self.reserver.all().count()
+                self.reserved_amount = reserved_amount
+                self.current_amount = self.total_amount - self.borrower.all().count() - reserved_amount
             if self.current_amount == 0:
                 self.status = 'L'
-
-            self.status = 'A'
+            else:
+                self.status = 'A'
 
         if self.current_amount > self.total_amount:
             self.current_amount = self.total_amount

@@ -105,7 +105,13 @@ def borrowerbooklist(request, user_id, book_pk, type):
         context['books_amount'] = books_amount
 
         book_reservers_amount = Book.objects.get(pk=book_pk).reserver.all().count()
-        print(book_reservers_amount)
+
+        if reserve.values()[0] in Book.objects.get(pk=book_pk).borrower.all().values() \
+                or \
+                reserve.values()[0] in Book.objects.get(pk=book_pk).reserver.all().values() :
+            # check if book is not in borrowers (or reservers) already (reserver cannot be borrower at the same time)
+            show_error_message(request, "User is already borrowing/reserving this book")
+            return redirect('/')
 
         if request.method == "POST":
             b = Book.objects.get(pk=book_pk)
@@ -114,11 +120,32 @@ def borrowerbooklist(request, user_id, book_pk, type):
                 show_error_message(request, "Reserved books limit reached (>3)")
             elif book_reservers_amount >= 3:
                 show_error_message(request, "The book cannot have more than 3 reservation")
+            elif reserve.values()[0] in Book.objects.get(pk=book_pk).borrower.all().values():
+                # check if book is not in borrowers already (reserver cannot be borrower at the same time)
+                show_error_message(request, "User is already borrowing this book")
+            elif reserve.values()[0] in Book.objects.get(pk=book_pk).reserver.all().values():
+                show_error_message(request, "User is already reserving this book")
             else:
                 b.reserver.add(u)
             return redirect('/')
         else:
             return render(request, 'bookshelf/reserverbooklist.html', context)
+    elif type == 'return':
+        user = User.objects.all().filter(id=user_id)
+        book = Book.objects.all().filter(pk=book_pk)
+
+        user_obj = User.objects.get(id=user_id)
+        book_obj = Book.objects.get(pk=book_pk)
+
+        if user.values()[0] in Book.objects.get(pk=book_pk).borrower.all().values():
+            book_obj.borrower.remove(user_obj)
+            book_obj.save()  # to make all amounts correct
+        elif user.values()[0] in Book.objects.get(pk=book_pk).reserver.all().values():
+            # TODO: remove user from borrowers or reservers and check if Book model saves correct amount
+            pass
+        else:  # user did not borrow the book
+            show_error_message(request, "This user did not borrow the book")
+        return redirect('/')
 
 
 class BookBorrow(DetailView):

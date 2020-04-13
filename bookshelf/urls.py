@@ -10,7 +10,7 @@ urlpatterns = [
     path('accounts/signup/', signup, name='signup'),
     path('book/borrowers/<int:pk>/', BookBorrowersDetailView.as_view(), name='borrowers_detail'),
     # path('borrowerbooks/<int:pk>/', BorrowerDetailView.as_view(), name='borrower_detail'),
-    path('<int:book_pk>/<str:type>/', bookborrow_getcardnumber, name='book_borrow'),
+    path('<int:book_pk>/<str:type>/', bookborrow_getcardnumber, name='getcardnumber'), #'book_borrow'),
     path('borrowerbooks/<int:user_id>/<str:type>/<int:book_pk>/', borrowerbooklist, name='borrower_detail'),
     # path('user/<int:user_pk>/borrow_book/<int:book_pk>', BookBorrow.as_view(), name='book_borrow')
 ]

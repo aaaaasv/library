@@ -1,5 +1,24 @@
 {% extends 'bookshelf/base.html' %}
 {% block title %} Library {% endblock %}
+{% block search %}
+    <button class="btn btn-outline-info my-3 my-sm-0"><a href="{% url 'index' %}">Show all books</a></button>
+    <form method="get" class="form-inline my-2 my-lg-0">
+        <select name="filterstatus" aria-labelledby="navbarDropdown">
+            <option value="" disabled selected>Filter Book Status</option>
+            <option value='A'
+                    style="background-color:transparent; border:none; cursor:pointer" ; color:black;
+                    class="filter-button">Available
+            </option>
+            <option value='L'
+                    style="background-color:transparent; border:none; cursor:pointer; color:black"
+                    class=" filter-button">Borrowed
+            </option>
+        </select>
+        <input class="form-control mr-sm-2 searchfield" id="searchbox" name="search" type="search"
+               value="{{ request.GET.searchit }}" placeholder="Search" aria-label="Search"/>
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+{% endblock %}
 {% block content %}
     {% load filters %}
     {% load static %}
@@ -15,7 +34,7 @@
                         <th scope="col">Title</th>
                         <th scope="col">Author</th>
                         <th scope="col">Status</th>
-{#                        <th scope="col">Shelf</th>#}
+                        {#                        <th scope="col">Shelf</th>#}
                         <th scope="col"></th>
                         </thead>
                         {% for book in object_list %}
@@ -41,7 +60,7 @@
                                         ({{ book.current_amount }}/{{ book.total_amount }})
                                     {% endif %}
                                 </td>
-{#                                <td>None</td>#}
+                                {#                                <td>None</td>#}
                                 <td>
 
                                     {#                                Button block                                 #}
@@ -54,17 +73,20 @@
                                                href="{% url 'book_delete' pk=book.pk %}">Remove</a>
 
                                             {% if book.current_amount > 0 %}
-                                                <a href="{% url 'book_borrow' book_pk=book.pk type='borrow' %}" type="button"
+                                                <a href="{% url 'getcardnumber' book_pk=book.pk type='borrow' %}"
+                                                   type="button"
                                                    class="btn btn-info">
                                                 Borrow
                                             {% else %}
-                                                <a href="{% url 'book_borrow' book_pk=book.pk type='reserve' %}" type="button"
+                                                <a href="{% url 'getcardnumber' book_pk=book.pk type='reserve' %}"
+                                                   type="button"
                                                    class="btn btn-info">
                                                 Reserve
                                             {% endif %}
                                             </a>
                                             {% if book.current_amount != book.total_amount %}
-                                                <button type="button" class="btn btn-4">Return</button>
+                                                <a href="{% url 'getcardnumber' book_pk=book.pk type='return' %}"
+                                                   type="button" class="btn btn-4">Return</a>
                                             {% else %}
                                                 <button type="button" class="btn btn-4 disabled"
                                                         style="cursor:not-allowed;">Return
@@ -90,7 +112,7 @@
             <div class="row">
                 <div class="col-sm-12 text-center">
                     <a type="button" class="btn btn-success" href="{% url 'book_create' %}">Add book</a>
-{#                    <button type="button" class="btn btn-success">Create new shelf</button>#}
+                    {#                    <button type="button" class="btn btn-success">Create new shelf</button>#}
                 </div>
 
             </div>
