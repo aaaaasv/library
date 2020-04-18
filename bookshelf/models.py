@@ -70,6 +70,7 @@ class Book(models.Model):
                 for reserver_user in enough_list:
                     self.borrower.add(reserver_user) # set user who is now reserver to borrower
                     self.reserver.remove(reserver_user) # remove user from reserver (because moved to borrower)
+                    # self.
                 super().save(*args, **kwargs)
                 reserved_amount = self.reserver.all().count()
                 self.reserved_amount = reserved_amount
@@ -92,16 +93,11 @@ class Book(models.Model):
 
 
 class Profile(models.Model):
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     card_number = models.CharField(max_length=13, default='000000000')
 
-    def save(self, *args, **kwargs):
-        """
-        set right card number
-        :param args:
-        :param kwargs:
-        :return:
-        """
+    def save(self, *args, **kwargs): # TODO: maybe init will be better
         card_n = ('0' * (9 - len(str(self.id)))) + str(self.id)
         self.card_number = card_n
 
@@ -115,6 +111,12 @@ class Profile(models.Model):
     @receiver(post_save, sender=User)
     def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
-
     def __str__(self):
         return self.user.username
+
+# class Librarian(Profile):
+    # def addBoo
+
+
+# class Member(Profile):
+#     date_of_membership = date()
