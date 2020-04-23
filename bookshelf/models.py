@@ -70,7 +70,6 @@ class Book(models.Model):
                 for reserver_user in enough_list:
                     self.borrower.add(reserver_user) # set user who is now reserver to borrower
                     self.reserver.remove(reserver_user) # remove user from reserver (because moved to borrower)
-                    # self.
                 super().save(*args, **kwargs)
                 reserved_amount = self.reserver.all().count()
                 self.reserved_amount = reserved_amount

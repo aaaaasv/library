@@ -2,26 +2,47 @@
 
 {% block content %}
     {% load filters %}
-
     <div class="container">
         <div class="row">
             <div class="col text-center">
                 {% for i in borrower %}
-                    <h4>{{ i.username }}</h4>
+                    <h4>{{ i.first_name }} {{ i.last_name }}</h4>
+                    <h5 class="text-muted">{{ i.username }}</h5>
                 {% endfor %}
-                <p>Borrowed books list({{ books_amount }}):</p>
-                {% for i in borrowed_books %}
-                    <p>{{ i|title }}</p>
-                {% endfor %}
+                <h5 class="text-muted">registered books ({{ books_amount }})</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-striped border border-info">
+                        <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Book Title</th>
+                            <th scope="col">Author's name</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in borrowed_books %}
+                            <tr>
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td>{{ i.title|title }}</td>
+                                <td>{{ i.author.first_name|title }} {{ i.author.last_name|title }}</td>
+                            </tr>
+                        {% endfor %}
+
+                        </tbody>
+                </div>
                 {% if user|has_group:"Librarian" %}
                     <form method="post">
-                    {% csrf_token %}
-                    {% for i in to_borrow %}
-                        <input type="submit" value="Confirm book ({{ i.title|title }}) borrowing">
-                    {% endfor %}
+                        {% csrf_token %}
+                        {% for i in to_borrow %}
+                            <input class="btn btn-info my-1" type="submit"
+                                   value="Confirm book ({{ i.title|title }}) borrowing">
+                        {% endfor %}
+                    </form>
                 {% endif %}
-                </form>
             </div>
         </div>
+
+
     </div>
 {% endblock %}

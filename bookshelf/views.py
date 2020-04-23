@@ -177,12 +177,12 @@ def bookborrow_getcardnumber(request, book_pk, type):
             if len(card_number) != 9:
                 show_error_message(request, 'Inputted card number is not correct. Try again.')
                 return redirect('/')
-            borrower_profile = Profile.objects.all().filter(card_number=card_number).values()
-            borrower_user = User.objects.all().filter(profile=borrower_profile[0]['id']).values()
             try:  # check if there is a user with inputted card number
+                borrower_profile = Profile.objects.all().filter(card_number=card_number).values()
+                borrower_user = User.objects.all().filter(profile=borrower_profile[0]['id']).values()
                 return redirect('borrower_detail', user_id=borrower_user[0]['id'], book_pk=book_pk, type=type)
             except IndexError:
-                show_error_message(request)
+                show_error_message(request, 'User with card number {} does not exist'.format(card_number))
     else:
         form = BorrowerCardNumberForm()
 
