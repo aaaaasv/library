@@ -13,14 +13,19 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import Book, Profile
 from .forms import BookEdit, BorrowerCardNumberForm
 
+from django.db.models.functions import Concat
 
 class BookListView(ListView):
-    paginate_by = 2 # TODO: Remove if page is filtering now
+    paginate_by = 10
     model = Book
 
     def get_queryset(self):
         filter_val = self.request.GET.get('filterstatus')
         query = self.request.GET.get('search')
+        if filter_val == None and query == None:
+            print(filter_val)
+            print(query)
+            paginate_by = 2  # TODO: Remove if page is filtering now
 
         if query:
             if len(query) > 30:
@@ -29,8 +34,16 @@ class BookListView(ListView):
             new_context = Book.objects.filter(
                 Q(title__icontains=query) |
                 Q(author__first_name__icontains=query) |
-                Q(author__last_name__icontains=query)
+                Q(author__last_name__icontains=query) |
+                Q(ISBN__icontains=query)
             )
+            if len(new_context) == 0:
+                query_s = query.split(' ') #first_name [0]; last_name[1]
+                if len(query_s) > 1:
+                    new_context = Book.objects.filter(
+                        Q(author__first_name__icontains=query_s[0]) &
+                        Q(author__last_name__icontains=query_s[1])
+                    )
         else:
             new_context = Book.objects.all()
         if filter_val:
@@ -176,7 +189,7 @@ def bookborrow_getcardnumber(request, book_pk, type):
             card_number = form.cleaned_data['card_number']
             if len(card_number) != 9:
                 show_error_message(request, 'Inputted card number is not correct. Try again.')
-                return redirect('/')
+                # return redirect('/')
             try:  # check if there is a user with inputted card number
                 borrower_profile = Profile.objects.all().filter(card_number=card_number).values()
                 borrower_user = User.objects.all().filter(profile=borrower_profile[0]['id']).values()

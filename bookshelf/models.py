@@ -11,6 +11,9 @@ class Author(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
 
+    def full_name(self):
+        return self.first_name + " " + self.last_name
+
     def __str__(self):
         return ("%s %s" % (self.last_name, self.first_name))
 
@@ -18,7 +21,7 @@ class Author(models.Model):
 class Book(models.Model):
     title = models.CharField(max_length=100)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    cover = models.CharField(max_length=200)
+    cover = models.CharField(max_length=200)#, default='static/bookshelf/standard_cover.png')
     total_amount = models.IntegerField(default=1)
     current_amount = models.IntegerField(default=1)
 
@@ -36,8 +39,8 @@ class Book(models.Model):
 
     STATUS_CHOICES = [
         ('A', 'Available'),
-        ('R', 'Reserved'),
-        ('L', 'Loaned'),
+        # ('R', 'Reserved'),
+        ('N', 'Not available'),
     ]
     status = models.CharField(
         max_length=1,
@@ -59,7 +62,7 @@ class Book(models.Model):
 
         self.current_amount = self.total_amount - self.borrower.all().count()
         if self.current_amount == 0:
-            self.status = 'L'
+            self.status = 'N'
         else:
             reserved_amount = self.reserver.all().count()
             if reserved_amount > 0:
@@ -75,7 +78,7 @@ class Book(models.Model):
                 self.reserved_amount = reserved_amount
                 self.current_amount = self.total_amount - self.borrower.all().count() - reserved_amount
             if self.current_amount == 0:
-                self.status = 'L'
+                self.status = 'N'
             else:
                 self.status = 'A'
 
@@ -89,6 +92,10 @@ class Book(models.Model):
 
     def __str__(self):
         return ("%s %s. %s" % (self.title, self.author.first_name[:1], self.author.last_name))
+
+
+# class ElectronicBook(Book):
+
 
 
 class Profile(models.Model):
