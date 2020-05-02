@@ -3,7 +3,7 @@ register = template.Library()
 
 @register.filter
 def get_status_color(status):
-    colors = {'A': '#00FF7F', 'N': 'red'}
+    colors = {'A': '#00FF7F', 'N': 'red', 'available':'#00FF7F'}
     return colors[status]
 
 

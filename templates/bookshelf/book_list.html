@@ -1,27 +1,45 @@
 {% extends 'bookshelf/base.html' %}
 {% block title %} Library {% endblock %}
 {% block search %}
-    <button class="btn btn-outline-info my-3 my-sm-0"><a href="{% url 'index' %}">Show all books</a></button>
-    <form method="get" class="form-inline my-2 my-lg-0">
-        <select name="filterstatus" aria-labelledby="navbarDropdown" class="btn btn-outline-info">
-            <option value="" disabled selected>Filter Book Status</option>
-            <option value='A'
-                    style="background-color:transparent; border:none; cursor:pointer" ; color:black;
-                    class="filter-button">Available
-            </option>
-            <option value='N'
-                    style="background-color:transparent; border:none; cursor:pointer; color:black"
-                    class=" filter-button">Not Available
-            </option>
-        </select>
-        <input class="form-control mr-sm-2 searchfield" id="searchbox" name="search" type="search"
-               value="{{ request.GET.searchit }}" placeholder="Search" aria-label="Search"/>
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-    </form>
+    <div class="row">
+        <div class="col d-flex flex-row">
+            {#    <form method="get" class="form-inline my-2 my-lg-0">#}
+            {#        <select name="filterstatus" aria-labelledby="navbarDropdown" class="btn btn-outline-info">#}
+            {#            <option value="" disabled selected>Filter Book Status</option>#}
+            {#            <option value='A'#}
+            {#                    style="background-color:transparent; border:none; cursor:pointer" ; color:black;#}
+            {#                    class="filter-button">Available#}
+            {#            </option>#}
+            {#            <option value='N'#}
+            {#                    style="background-color:transparent; border:none; cursor:pointer; color:black"#}
+            {#                    class=" filter-button">Not Available#}
+            {#            </option>#}
+            {#        </select>#}
+            {#        <input class="form-control mr-sm-2 searchfield" id="searchbox" name="search" type="search"#}
+            {#               value="{{ request.GET.searchit }}" placeholder="Search" aria-label="Search"/>#}
+            {#        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>#}
+            {#    </form>#}
+            <form action="" method="get">
+                {% for i in filterset.form %}
+                    <div class="badge badge-info text-wrap p-2"
+                         style="cursor:default; background-color:#804ED1; color:white;" title="Find book by
+                            {% if i.label != 'ISBN' %}{{ i.label|lower }}{% else %}{{ i.label }}{% endif %}">
+                        {{ i.label }}
+                    </div>
+                    {{ i }}
+                {% endfor %}
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                <button class="btn btn-outline-info my-3 my-sm-0"><a href="{% url 'index' %}">Show all books</a>
+                </button>
+
+            </form>
+        </div>
+    </div>
 {% endblock %}
 {% block content %}
     {% load filters %}
     {% load static %}
+    {% load tags %}
     <link rel="stylesheet" href="{% static "bookshelf/styles/book_list.css" %}" type="text/css">
     <div class="container-fluid">
         <div class="row">
@@ -69,50 +87,58 @@
                                     {% endif %}
                                 </td>
                                 {#                                <td>None</td>#}
-                                <td>
+                                <style>
+
+                                </style>
+                                <td class="text-center">
 
                                     {#                                Button block                                 #}
-
                                     {% if request.user|has_group:"Librarian" %}
                                         <div class="btn-group-vertical" role="group" aria-label="Management Panel">
-                                        <a type="button" class="btn btn-success"
-                                           href="{% url 'book_update' pk=book.pk %}">Edit</a>
-                                        <a type="button" class="btn btn-danger"
-                                           href="{% url 'book_delete' pk=book.pk %}">Remove</a>
+                                        <a type="button" class="btn my-1"
+                                           href="{% url 'book_update' pk=book.pk %}"
+                                           style="background-color:#5F00BA; color:white;">Edit</a>
+                                        <a type="button" class="btn my-1"
+                                           href="{% url 'book_delete' pk=book.pk %}"
+                                           style="background-color:#7027C6; color:white;">Remove</a>
                                         {% if book.type == 'paperback' %}
                                             {% if book.paperbook.current_amount > 0 %}
                                                 <a href="{% url 'getcardnumber' book_pk=book.paperbook.pk type='borrow' %}"
                                                    type="button"
-                                                   class="btn btn-info">
+                                                   class="btn my-1" style="background-color:#7027C6; color:white;">
                                                 Borrow
                                             {% else %}
                                                 <a href="{% url 'getcardnumber' book_pk=book.paperbook.pk type='reserve' %}"
                                                    type="button"
-                                                   class="btn btn-info">
+                                                   class="btn my-1" style="background-color:#804ED1; color:white;">
                                                 Reserve
                                             {% endif %}
                                         </a>
                                             {% if book.paperbook.current_amount != book.paperbook.total_amount %}
                                                 <a href="{% url 'getcardnumber' book_pk=book.paperbook.pk type='return' %}"
-                                                   type="button" class="btn btn-4">Return</a>
+                                                   type="button" class="btn my-1"
+                                                   style="background-color:#9075DC; color:white;">Return</a>
                                             {% else %}
-                                                <button type="button" class="btn btn-4 disabled"
-                                                        style="cursor:not-allowed;">Return
+                                                <button type="button" class="btn disabled my-1"
+                                                        style="cursor:not-allowed; background-color:#9075DC; color:white;">
+                                                    Return
                                                 </button>
                                             {% endif %}
-                                            <a type="button" class="btn btn-4"
-                                               href="{% url 'borrowers_detail' pk=book.paperbook.pk %}">Debtors</a>
+                                            <a type="button" class="btn my-1"
+                                               href="{% url 'borrowers_detail' pk=book.paperbook.pk %}"
+                                               style="background-color:#A09BE7; color:white;">Debtors</a>
 
                                         {% endif %}
                                     {% endif %}
                                     {% if book.type == 'electronic' %}
                                         {% if user.is_authenticated %}
-                                        <a type="button" class="btn btn-success"
-                                           href="{{ book.electronicbook.link }}">
+                                            <a type="button" class="btn my-1"
+                                               href="{{ book.electronicbook.link }}"
+                                               style="background-color:#804ED1; color:white;">
 
-                                            {{ book.electronicbook.file_format }}
-                                        </a>
-                                            {% endif %}
+                                                {{ book.electronicbook.file_format }}
+                                            </a>
+                                        {% endif %}
                                     {% endif %}
                                     </div>
                                 </td>
@@ -128,14 +154,16 @@
             </div>
         </div>
         {#    TODO: Remove pagination when filtering    #}
-        {% if not filtered %}
+        {% if is_paginated %}
             <div class="row my-2">
                 <div class="col-sm-12 text-center">
                     <div class="pagination d-flex flex-column align-items-center">
             <span class="step-links">
             {% if page_obj.has_previous %}
-                <a class="btn btn-outline-success" href="?page=1">&laquo; first</a>
-                <a class="btn btn-outline-success" href="?page={{ page_obj.previous_page_number }}">previous</a>
+                <a class="btn btn-outline-success" href="?{% param_replace page=1 %}">&laquo; first</a>
+                {% if page_obj.previous_page_number != 1 %}
+                    <a class="btn btn-outline-success" href="?{% param_replace page=page_obj.previous_page_number %}">previous</a>
+                {% endif %}
             {% endif %}
 
                 <span class="current">
@@ -143,8 +171,11 @@
             </span>
 
                 {% if page_obj.has_next %}
-                    <a class="btn btn-outline-success" href="?page={{ page_obj.next_page_number }}">next</a>
-                    <a class="btn btn-outline-success" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                    {% if page_obj.next_page_number != paginator.num_pages %}
+                        <a class="btn btn-outline-success" href="?{% param_replace page=page_obj.next_page_number %}">next</a>
+                    {% endif %}
+                    <a class="btn btn-outline-success"
+                       href="?{% param_replace page=paginator.num_pages %}">last &raquo;</a>
                 {% endif %}
             </span>
                     </div>
@@ -157,7 +188,6 @@
             <div class="row">
                 <div class="col-sm-12 text-center">
                     <a type="button" class="btn btn-success" href="{% url 'book_create' %}">Add book</a>
-                    {#                    <button type="button" class="btn btn-success">Create new shelf</button>#}
                 </div>
 
             </div>

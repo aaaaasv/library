@@ -9,56 +9,89 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
-
+import django_filters
 
 from .models import Book, Profile, ElectronicBook, PaperBook
 from .forms import BookEdit, BorrowerCardNumberForm
 
 from django.db.models.functions import Concat
 
-class BookListView(ListView):
-    paginate_by = 10
+
+class BookFilter(django_filters.FilterSet):
+    def __init__(self, data, *args, **kwargs):
+        data = data.copy()
+        data.setdefault('order', 'added')
+        super().__init__(data, *args, **kwargs)
+
+    class Meta:
+        model = Book
+        exclude = 'cover'
+
+
+class FilteredListView(ListView):
+    filterset_class = None
+
+    def get_queryset(self):
+        # Get the queryset however you usually would.  For example:
+        queryset = super().get_queryset()
+        # Then use the query parameters and the queryset to
+        # instantiate a filterset and save it as an attribute
+        # on the view instance for later.
+        self.filterset = self.filterset_class(self.request.GET, queryset=queryset)
+        # Return the filtered queryset
+        return self.filterset.qs.distinct()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Pass the filterset to the template - it provides the form.
+        context['filterset'] = self.filterset
+        return context
+
+
+class BookListView(FilteredListView):
+    paginate_by = 3
+    filterset_class = BookFilter
+    # paginate_by = 10
     model = Book
     template_name = 'bookshelf/book_list.html'
 
-    def get_queryset(self):
-        filter_val = self.request.GET.get('filterstatus')
-        query = self.request.GET.get('search')
-
-        if query:
-            if len(query) > 30:
-                return Book.objects.all()
-        if query:
-            new_context = Book.objects.filter(
-                Q(title__icontains=query) |
-                Q(author__first_name__icontains=query) |
-                Q(author__last_name__icontains=query) |
-                Q(ISBN__icontains=query)
-            )
-            if len(new_context) == 0:
-                query_s = query.split(' ') #first_name [0]; last_name[1]
-                if len(query_s) > 1:
-                    new_context = Book.objects.filter(
-                        Q(author__first_name__icontains=query_s[0]) &
-                        Q(author__last_name__icontains=query_s[1])
-                    )
-        else:
-            new_context = Book.objects.all()
-        if filter_val:
-            new_context = new_context.filter(status=filter_val)
-
-        return new_context
-
-    def get_context_data(self, **kwargs):
-        context = super(BookListView, self).get_context_data(**kwargs)
-        # context.update({
-        #     'eBook': ElectronicBook.objects.all(),
-        # })
-        # context['filtered'] = True
-        context['filter'] = self.request.GET.get('filter', '')
-        context['orderby'] = self.request.GET.get('orderby', 'id')
-        return context
-
+    # def get_queryset(self):
+    #     filter_val = self.request.GET.get('filterstatus')
+    #     query = self.request.GET.get('search')
+    #
+    #     if query:
+    #         if len(query) > 30:
+    #             return Book.objects.all()
+    #     if query:
+    #         new_context = Book.objects.filter(
+    #             Q(title__icontains=query) |
+    #             Q(author__first_name__icontains=query) |
+    #             Q(author__last_name__icontains=query) |
+    #             Q(ISBN__icontains=query)
+    #         )
+    #         if len(new_context) == 0:
+    #             query_s = query.split(' ') #first_name [0]; last_name[1]
+    #             if len(query_s) > 1:
+    #                 new_context = Book.objects.filter(
+    #                     Q(author__first_name__icontains=query_s[0]) &
+    #                     Q(author__last_name__icontains=query_s[1])
+    #                 )
+    #     else:
+    #         new_context = Book.objects.all()
+    #     if filter_val:
+    #         new_context = new_context.filter(status=filter_val)
+    #
+    #     return new_context
+    #
+    # def get_context_data(self, **kwargs):
+    #     context = super(BookListView, self).get_context_data(**kwargs)
+    #     # context.update({
+    #     #     'eBook': ElectronicBook.objects.all(),
+    #     # })
+    #     # context['filtered'] = True
+    #     context['filter'] = self.request.GET.get('filter', '')
+    #     context['orderby'] = self.request.GET.get('orderby', 'id')
+    #     return context
 
 
 class BookUpdate(UpdateView):
