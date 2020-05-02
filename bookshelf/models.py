@@ -20,12 +20,8 @@ class Author(models.Model):
 
 class Book(models.Model):
     title = models.CharField(max_length=100)
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, null=True)
     cover = models.CharField(max_length=200, default='static/bookshelf/standard_cover.png')
-    total_amount = models.IntegerField(default=1)
-    current_amount = models.IntegerField(default=1)
-
-    reserved_amount = models.IntegerField(default=0)
 
     ISBN = models.CharField(max_length=13, default='0000000000000')
 
@@ -39,7 +35,6 @@ class Book(models.Model):
 
     STATUS_CHOICES = [
         ('A', 'Available'),
-        # ('R', 'Reserved'),
         ('N', 'Not available'),
     ]
     status = models.CharField(
@@ -47,6 +42,18 @@ class Book(models.Model):
         choices=STATUS_CHOICES,
         default='A',
     )
+
+    def __str__(self):
+        return ("%s %s. %s" % (self.title, self.author.first_name[:1], self.author.last_name))
+
+    # class Meta:
+    #     abstract = True
+
+class PaperBook(Book):
+    total_amount = models.IntegerField(default=1)
+    current_amount = models.IntegerField(default=1)
+
+    reserved_amount = models.IntegerField(default=0)
 
     borrower = models.ManyToManyField(User, blank=True, related_name='borrowerOfBook')
     reserver = models.ManyToManyField(User, blank=True, related_name='reserverOfBook')
@@ -95,10 +102,6 @@ class Book(models.Model):
 
         super().save(*args, **kwargs)
 
-    def __str__(self):
-        return ("%s %s. %s" % (self.title, self.author.first_name[:1], self.author.last_name))
-
-
 class ElectronicBook(Book):
     file_format = models.CharField(max_length=10, default='')
     link = models.CharField(max_length=100, default='')
@@ -108,7 +111,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     card_number = models.CharField(max_length=13, default='000000000')
 
-    def save(self, *args, **kwargs):  # TODO: maybe init will be better
+    def save(self, *args, **kwargs):
         card_n = ('0' * (9 - len(str(self.id)))) + str(self.id)
         self.card_number = card_n
 
@@ -126,9 +129,3 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
 
-# class Librarian(Profile):
-# def addBoo
-
-
-# class Member(Profile):
-#     date_of_membership = date()

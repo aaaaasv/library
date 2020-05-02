@@ -11,7 +11,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 
 
-from .models import Book, Profile, ElectronicBook
+from .models import Book, Profile, ElectronicBook, PaperBook
 from .forms import BookEdit, BorrowerCardNumberForm
 
 from django.db.models.functions import Concat
@@ -19,14 +19,11 @@ from django.db.models.functions import Concat
 class BookListView(ListView):
     paginate_by = 10
     model = Book
+    template_name = 'bookshelf/book_list.html'
 
     def get_queryset(self):
         filter_val = self.request.GET.get('filterstatus')
         query = self.request.GET.get('search')
-        if filter_val == None and query == None:
-            print(filter_val)
-            print(query)
-            paginate_by = 2  # TODO: Remove if page is filtering now
 
         if query:
             if len(query) > 30:
@@ -54,11 +51,14 @@ class BookListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(BookListView, self).get_context_data(**kwargs)
+        # context.update({
+        #     'eBook': ElectronicBook.objects.all(),
+        # })
         # context['filtered'] = True
-        context['ebooks'] = ElectronicBook.objects.all()
         context['filter'] = self.request.GET.get('filter', '')
         context['orderby'] = self.request.GET.get('orderby', 'id')
         return context
+
 
 
 class BookUpdate(UpdateView):
@@ -70,7 +70,7 @@ class BookUpdate(UpdateView):
 
 
 class BookCreate(CreateView):
-    model = Book
+    model = PaperBook
     fields = '__all__'
     success_url = '/'
     template_name_suffix = '_create_form'
@@ -91,23 +91,23 @@ def borrowerbooklist(request, user_id, book_pk, type):
     if type == 'borrow':
         borrow = User.objects.all().filter(id=user_id)
         context['borrower'] = borrow.values()
-        context['borrowed_books'] = Book.objects.all().filter(borrower=borrow[0])
-        context['to_borrow'] = Book.objects.all().filter(pk=book_pk).values()
-        books_amount = len(Book.objects.all().filter(borrower=borrow[0]))
+        context['borrowed_books'] = PaperBook.objects.all().filter(borrower=borrow[0])
+        context['to_borrow'] = PaperBook.objects.all().filter(pk=book_pk).values()
+        books_amount = len(PaperBook.objects.all().filter(borrower=borrow[0]))
         context['books_amount'] = books_amount
 
         if request.method == "POST":
-            b = Book.objects.get(pk=book_pk)
+            b = PaperBook.objects.get(pk=book_pk)
             u = User.objects.get(id=user_id)
             if books_amount >= 5:
                 show_error_message(request, "Book limit reached (>5)")
             else:
                 b.borrower.add(u)
 
-                boooks = Book.objects.get(pk=book_pk)
+                boooks = PaperBook.objects.get(pk=book_pk)
                 amount_of_borrowers = boooks.borrower.all().count()
-                total_amount_books = Book.objects.all().filter(pk=book_pk).values()[0]['total_amount']
-                b = Book.objects.get(pk=book_pk)
+                total_amount_books = PaperBook.objects.all().filter(pk=book_pk).values()[0]['total_amount']
+                b = PaperBook.objects.get(pk=book_pk)
                 b.current_amount = total_amount_books - amount_of_borrowers
                 b.save()
             return redirect('/')
@@ -117,31 +117,31 @@ def borrowerbooklist(request, user_id, book_pk, type):
     elif type == 'reserve':
         reserve = User.objects.all().filter(id=user_id)
         context['reserver'] = reserve.values()
-        context['reserved_books'] = Book.objects.all().filter(reserver=reserve[0])
-        context['to_reserve'] = Book.objects.all().filter(pk=book_pk).values()
-        books_amount = len(Book.objects.all().filter(reserver=reserve[0]))
+        context['reserved_books'] = PaperBook.objects.all().filter(reserver=reserve[0])
+        context['to_reserve'] = PaperBook.objects.all().filter(pk=book_pk).values()
+        books_amount = len(PaperBook.objects.all().filter(reserver=reserve[0]))
         context['books_amount'] = books_amount
 
-        book_reservers_amount = Book.objects.get(pk=book_pk).reserver.all().count()
+        book_reservers_amount = PaperBook.objects.get(pk=book_pk).reserver.all().count()
 
-        if reserve.values()[0] in Book.objects.get(pk=book_pk).borrower.all().values() \
+        if reserve.values()[0] in PaperBook.objects.get(pk=book_pk).borrower.all().values() \
                 or \
-                reserve.values()[0] in Book.objects.get(pk=book_pk).reserver.all().values():
+                reserve.values()[0] in PaperBook.objects.get(pk=book_pk).reserver.all().values():
             # check if book is not in borrowers (or reservers) already (reserver cannot be borrower at the same time)
             show_error_message(request, "User is already borrowing/reserving this book")
             return redirect('/')
 
         if request.method == "POST":
-            b = Book.objects.get(pk=book_pk)
+            b = PaperBook.objects.get(pk=book_pk)
             u = User.objects.get(id=user_id)
             if books_amount >= 3:
                 show_error_message(request, "Reserved books limit reached (>3)")
             elif book_reservers_amount >= 3:
                 show_error_message(request, "The book cannot have more than 3 reservation")
-            elif reserve.values()[0] in Book.objects.get(pk=book_pk).borrower.all().values():
+            elif reserve.values()[0] in PaperBook.objects.get(pk=book_pk).borrower.all().values():
                 # check if book is not in borrowers already (reserver cannot be borrower at the same time)
                 show_error_message(request, "User is already borrowing this book")
-            elif reserve.values()[0] in Book.objects.get(pk=book_pk).reserver.all().values():
+            elif reserve.values()[0] in PaperBook.objects.get(pk=book_pk).reserver.all().values():
                 show_error_message(request, "User is already reserving this book")
             else:
                 b.reserver.add(u)
@@ -150,15 +150,15 @@ def borrowerbooklist(request, user_id, book_pk, type):
             return render(request, 'bookshelf/reserverbooklist.html', context)
     elif type == 'return':
         user = User.objects.all().filter(id=user_id)
-        book = Book.objects.all().filter(pk=book_pk)
+        book = PaperBook.objects.all().filter(pk=book_pk)
 
         user_obj = User.objects.get(id=user_id)
-        book_obj = Book.objects.get(pk=book_pk)
+        book_obj = PaperBook.objects.get(pk=book_pk)
 
-        if user.values()[0] in Book.objects.get(pk=book_pk).borrower.all().values():
+        if user.values()[0] in PaperBook.objects.get(pk=book_pk).borrower.all().values():
             book_obj.borrower.remove(user_obj)
             book_obj.save()  # to make all amounts correct
-        elif user.values()[0] in Book.objects.get(pk=book_pk).reserver.all().values():
+        elif user.values()[0] in PaperBook.objects.get(pk=book_pk).reserver.all().values():
             # TODO: remove user from borrowers or reservers and check if Book model saves correct amount
             pass
         else:  # user did not borrow the book
@@ -183,7 +183,7 @@ def show_error_message(request, message):
 
 def bookborrow_getcardnumber(request, book_pk, type):
     context = {}
-    context['borrow_book'] = Book.objects.all().filter(pk=book_pk).values()
+    context['borrow_book'] = PaperBook.objects.all().filter(pk=book_pk).values()
     context['type'] = type
     if request.method == "GET":
         form = BorrowerCardNumberForm(request.GET)

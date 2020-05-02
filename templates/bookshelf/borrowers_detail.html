@@ -22,7 +22,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for i in book.borrower.all %}
+                        {% for i in book.paperbook.borrower.all %}
                             <tr>
                                 <th scope="row">{{ forloop.counter }}</th>
                                 <td>{{ i.username }}</td>

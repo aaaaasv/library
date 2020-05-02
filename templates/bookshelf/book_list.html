@@ -60,13 +60,12 @@
                                 <td>{{ book.author.first_name|title }} {{ book.author.last_name|title }}</td>
                                 <td style="color:{{ book.status|get_status_color }}">
                                     {% if book.type == 'paperback' %}
-
                                         {{ book.get_status_display }}
                                         {% if book.status == 'A' %}
-                                            ({{ book.current_amount }}/{{ book.total_amount }})
+                                            ({{ book.paperbook.current_amount }}/{{ book.paperbook.total_amount }})
                                         {% endif %}
                                     {% else %}
-                                        <p></p>
+                                        <p style="color:blue">Electronic</p>
                                     {% endif %}
                                 </td>
                                 {#                                <td>None</td>#}
@@ -81,20 +80,20 @@
                                         <a type="button" class="btn btn-danger"
                                            href="{% url 'book_delete' pk=book.pk %}">Remove</a>
                                         {% if book.type == 'paperback' %}
-                                            {% if book.current_amount > 0 %}
-                                                <a href="{% url 'getcardnumber' book_pk=book.pk type='borrow' %}"
+                                            {% if book.paperbook.current_amount > 0 %}
+                                                <a href="{% url 'getcardnumber' book_pk=book.paperbook.pk type='borrow' %}"
                                                    type="button"
                                                    class="btn btn-info">
                                                 Borrow
                                             {% else %}
-                                                <a href="{% url 'getcardnumber' book_pk=book.pk type='reserve' %}"
+                                                <a href="{% url 'getcardnumber' book_pk=book.paperbook.pk type='reserve' %}"
                                                    type="button"
                                                    class="btn btn-info">
                                                 Reserve
                                             {% endif %}
                                         </a>
-                                            {% if book.current_amount != book.total_amount %}
-                                                <a href="{% url 'getcardnumber' book_pk=book.pk type='return' %}"
+                                            {% if book.paperbook.current_amount != book.paperbook.total_amount %}
+                                                <a href="{% url 'getcardnumber' book_pk=book.paperbook.pk type='return' %}"
                                                    type="button" class="btn btn-4">Return</a>
                                             {% else %}
                                                 <button type="button" class="btn btn-4 disabled"
@@ -102,16 +101,18 @@
                                                 </button>
                                             {% endif %}
                                             <a type="button" class="btn btn-4"
-                                               href="{% url 'borrowers_detail' pk=book.pk %}">Debtors</a>
+                                               href="{% url 'borrowers_detail' pk=book.paperbook.pk %}">Debtors</a>
 
                                         {% endif %}
                                     {% endif %}
                                     {% if book.type == 'electronic' %}
+                                        {% if user.is_authenticated %}
                                         <a type="button" class="btn btn-success"
                                            href="{{ book.electronicbook.link }}">
 
                                             {{ book.electronicbook.file_format }}
                                         </a>
+                                            {% endif %}
                                     {% endif %}
                                     </div>
                                 </td>
