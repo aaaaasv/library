@@ -51,13 +51,22 @@
                                                 title="Paperback">
                                         {{ book.title|title }}</td>
                                 {% else %}
-                                    <td>{{ book.title|title }}</td>
+                                    <td><img
+                                            src="https://image.flaticon.com/icons/svg/2784/2784602.svg"
+                                            alt="eBook"
+                                            style="max-width:1.5em"
+                                            title="eBook">{{ book.title|title }}</td>
                                 {% endif %}
                                 <td>{{ book.author.first_name|title }} {{ book.author.last_name|title }}</td>
                                 <td style="color:{{ book.status|get_status_color }}">
-                                    {{ book.get_status_display }}
-                                    {% if book.status == 'A' %}
-                                        ({{ book.current_amount }}/{{ book.total_amount }})
+                                    {% if book.type == 'paperback' %}
+
+                                        {{ book.get_status_display }}
+                                        {% if book.status == 'A' %}
+                                            ({{ book.current_amount }}/{{ book.total_amount }})
+                                        {% endif %}
+                                    {% else %}
+                                        <p></p>
                                     {% endif %}
                                 </td>
                                 {#                                <td>None</td>#}
@@ -67,11 +76,11 @@
 
                                     {% if request.user|has_group:"Librarian" %}
                                         <div class="btn-group-vertical" role="group" aria-label="Management Panel">
-                                            <a type="button" class="btn btn-success"
-                                               href="{% url 'book_update' pk=book.pk %}">Edit</a>
-                                            <a type="button" class="btn btn-danger"
-                                               href="{% url 'book_delete' pk=book.pk %}">Remove</a>
-
+                                        <a type="button" class="btn btn-success"
+                                           href="{% url 'book_update' pk=book.pk %}">Edit</a>
+                                        <a type="button" class="btn btn-danger"
+                                           href="{% url 'book_delete' pk=book.pk %}">Remove</a>
+                                        {% if book.type == 'paperback' %}
                                             {% if book.current_amount > 0 %}
                                                 <a href="{% url 'getcardnumber' book_pk=book.pk type='borrow' %}"
                                                    type="button"
@@ -83,7 +92,7 @@
                                                    class="btn btn-info">
                                                 Reserve
                                             {% endif %}
-                                            </a>
+                                        </a>
                                             {% if book.current_amount != book.total_amount %}
                                                 <a href="{% url 'getcardnumber' book_pk=book.pk type='return' %}"
                                                    type="button" class="btn btn-4">Return</a>
@@ -93,11 +102,20 @@
                                                 </button>
                                             {% endif %}
                                             <a type="button" class="btn btn-4"
-                                               href="{% url 'borrowers_detail' pk=book.pk %}">See Debtors</a>
-                                        </div>
-                                        </td>
-                                        </tr>
+                                               href="{% url 'borrowers_detail' pk=book.pk %}">Debtors</a>
+
+                                        {% endif %}
                                     {% endif %}
+                                    {% if book.type == 'electronic' %}
+                                        <a type="button" class="btn btn-success"
+                                           href="{{ book.electronicbook.link }}">
+
+                                            {{ book.electronicbook.file_format }}
+                                        </a>
+                                    {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
                         {% empty %}
                             <p>There are no books yet.</p>
 
@@ -108,11 +126,11 @@
                 </div>
             </div>
         </div>
-{#    TODO: Remove pagination when filtering    #}
-    {% if not filtered %}
-        <div class="row my-2">
-            <div class="col-sm-12 text-center">
-                <div class="pagination d-flex flex-column align-items-center">
+        {#    TODO: Remove pagination when filtering    #}
+        {% if not filtered %}
+            <div class="row my-2">
+                <div class="col-sm-12 text-center">
+                    <div class="pagination d-flex flex-column align-items-center">
             <span class="step-links">
             {% if page_obj.has_previous %}
                 <a class="btn btn-outline-success" href="?page=1">&laquo; first</a>
@@ -128,10 +146,10 @@
                     <a class="btn btn-outline-success" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
                 {% endif %}
             </span>
+                    </div>
                 </div>
             </div>
-        </div>
-    {% endif %}
+        {% endif %}
 
 
         {% if request.user|has_group:"Librarian" %}

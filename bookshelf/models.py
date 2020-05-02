@@ -53,34 +53,39 @@ class Book(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        When zero books are available, automatically change its status to - 'Loaned';
+        When zero books are available, automatically change its status to - 'Not available';
         When > 0 books are available, change its status to - 'Available'
         :param args:
         :param kwargs:
         :return:
         """
-
-        self.current_amount = self.total_amount - self.borrower.all().count()
-        if self.current_amount == 0:
-            self.status = 'N'
-        else:
-            reserved_amount = self.reserver.all().count()
-            if reserved_amount > 0:
-                # TODO: 3 reserved books per user and 3 reservations per book is maximum
-                for i in self.reserver.all():
-                    print(i)
-                enough_list = self.reserver.all()[:self.current_amount] # slice so that all users will get reserved book and current amount wont be < 0
-                for reserver_user in enough_list:
-                    self.borrower.add(reserver_user) # set user who is now reserver to borrower
-                    self.reserver.remove(reserver_user) # remove user from reserver (because moved to borrower)
+        if self.type == 'paperback':
+            try:
+                self.current_amount = self.total_amount - self.borrower.all().count()
+            except ValueError:
                 super().save(*args, **kwargs)
-                reserved_amount = self.reserver.all().count()
-                self.reserved_amount = reserved_amount
-                self.current_amount = self.total_amount - self.borrower.all().count() - reserved_amount
+                return
             if self.current_amount == 0:
                 self.status = 'N'
             else:
-                self.status = 'A'
+                reserved_amount = self.reserver.all().count()
+                if reserved_amount > 0:
+                    # TODO: 3 reserved books per user and 3 reservations per book is maximum
+                    for i in self.reserver.all():
+                        print(i)
+                    enough_list = self.reserver.all()[
+                                  :self.current_amount]  # slice so that all users will get reserved book and current amount wont be < 0
+                    for reserver_user in enough_list:
+                        self.borrower.add(reserver_user)  # set user who is now reserver to borrower
+                        self.reserver.remove(reserver_user)  # remove user from reserver (because moved to borrower)
+                    super().save(*args, **kwargs)
+                    reserved_amount = self.reserver.all().count()
+                    self.reserved_amount = reserved_amount
+                    self.current_amount = self.total_amount - self.borrower.all().count() - reserved_amount
+                if self.current_amount == 0:
+                    self.status = 'N'
+                else:
+                    self.status = 'A'
 
         if self.current_amount > self.total_amount:
             self.current_amount = self.total_amount
@@ -94,19 +99,16 @@ class Book(models.Model):
         return ("%s %s. %s" % (self.title, self.author.first_name[:1], self.author.last_name))
 
 
-# class ElectronicBook(Book):
-#     file_format = models.CharField(max_length=10, default='')
-#     link = models.CharField(max_length=100, default='')
-
-
+class ElectronicBook(Book):
+    file_format = models.CharField(max_length=10, default='')
+    link = models.CharField(max_length=100, default='')
 
 
 class Profile(models.Model):
-
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     card_number = models.CharField(max_length=13, default='000000000')
 
-    def save(self, *args, **kwargs): # TODO: maybe init will be better
+    def save(self, *args, **kwargs):  # TODO: maybe init will be better
         card_n = ('0' * (9 - len(str(self.id)))) + str(self.id)
         self.card_number = card_n
 
@@ -120,11 +122,12 @@ class Profile(models.Model):
     @receiver(post_save, sender=User)
     def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
+
     def __str__(self):
         return self.user.username
 
 # class Librarian(Profile):
-    # def addBoo
+# def addBoo
 
 
 # class Member(Profile):

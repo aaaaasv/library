@@ -10,7 +10,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 
-from .models import Book, Profile
+
+from .models import Book, Profile, ElectronicBook
 from .forms import BookEdit, BorrowerCardNumberForm
 
 from django.db.models.functions import Concat
@@ -54,6 +55,7 @@ class BookListView(ListView):
     def get_context_data(self, **kwargs):
         context = super(BookListView, self).get_context_data(**kwargs)
         # context['filtered'] = True
+        context['ebooks'] = ElectronicBook.objects.all()
         context['filter'] = self.request.GET.get('filter', '')
         context['orderby'] = self.request.GET.get('orderby', 'id')
         return context

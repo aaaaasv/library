@@ -1,5 +1,5 @@
 from django.contrib import admin
-from bookshelf.models import Book, Author, Profile
+from bookshelf.models import Book, Author, Profile, ElectronicBook
 
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
@@ -15,5 +15,6 @@ class BookAdmin(ImportExportModelAdmin):
 admin.site.register(Book, BookAdmin)
 admin.site.register(Author)
 admin.site.register(Profile)
+admin.site.register(ElectronicBook)
 
 
