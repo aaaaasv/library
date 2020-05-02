@@ -40,7 +40,7 @@
                         {% for book in object_list %}
                             <tr>
                                 <th scope="row">{{ forloop.counter }}</th>
-                                <td><img src="{{ book.cover }}" alt=""
+                                <td><img class="rounded border border-dark" src="{{ book.cover }}" alt=""
                                          style="max-width:8em; cursor:pointer"></td>
                                 {% if book.type == 'paperback' %}
                                     <td>

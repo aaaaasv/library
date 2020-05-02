@@ -21,7 +21,7 @@ class Author(models.Model):
 class Book(models.Model):
     title = models.CharField(max_length=100)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    cover = models.CharField(max_length=200)#, default='static/bookshelf/standard_cover.png')
+    cover = models.CharField(max_length=200, default='static/bookshelf/standard_cover.png')
     total_amount = models.IntegerField(default=1)
     current_amount = models.IntegerField(default=1)
 
@@ -95,6 +95,9 @@ class Book(models.Model):
 
 
 # class ElectronicBook(Book):
+#     file_format = models.CharField(max_length=10, default='')
+#     link = models.CharField(max_length=100, default='')
+
 
 
 
