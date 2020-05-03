@@ -12,7 +12,7 @@ from django.contrib.auth.forms import UserCreationForm
 import django_filters
 
 from .models import Book, Profile, ElectronicBook, PaperBook
-from .forms import BookEdit, BorrowerCardNumberForm
+from .forms import BookEdit, EBookEdit, BorrowerCardNumberForm, EBookCreate
 
 from django.db.models.functions import Concat
 
@@ -96,7 +96,18 @@ class BookListView(FilteredListView):
 
 class BookUpdate(UpdateView):
     model = Book
-    fields = '__all__'
+    form_class = BookEdit
+
+    # fields = '__all__'
+    # exclude = ['type']
+
+    def get_success_url(self):
+        return reverse('index')
+
+
+class EBookUpdate(UpdateView):
+    model = Book
+    form_class = EBookEdit
 
     def get_success_url(self):
         return reverse('index')
@@ -107,6 +118,13 @@ class BookCreate(CreateView):
     fields = '__all__'
     success_url = '/'
     template_name_suffix = '_create_form'
+
+
+class EBookCreate(CreateView):
+    model = ElectronicBook
+    form_class = EBookCreate
+    success_url = '/'
+    template_name = 'bookshelf/paperbook_create_form.html'
 
 
 class BookDelete(DeleteView):

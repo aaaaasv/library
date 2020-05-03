@@ -6,21 +6,27 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col text-center">
-                {% for i in reserver %}
-                    <h4>{{ i.username }}</h4>
-                {% endfor %}
-                <p>Reserved books list({{ books_amount }}):</p>
-                {% for i in reserved_books %}
-                    <p>{{ i|title }}</p>
-                {% endfor %}
-                {% if user|has_group:"Librarian" %}
-                    <form method="post">
-                    {% csrf_token %}
-                    {% for i in to_reserve %}
-                        <input type="submit" value="Confirm book ({{ i.title|title }}) reserving">
+                {% if request.user|has_group:"Librarian" %}
+
+
+                    {% for i in reserver %}
+                        <h4>{{ i.username }}</h4>
                     {% endfor %}
-                {% endif %}
+                    <p>Reserved books list({{ books_amount }}):</p>
+                    {% for i in reserved_books %}
+                        <p>{{ i|title }}</p>
+                    {% endfor %}
+                    {% if user|has_group:"Librarian" %}
+                        <form method="post">
+                        {% csrf_token %}
+                        {% for i in to_reserve %}
+                            <input type="submit" value="Confirm book ({{ i.title|title }}) reserving">
+                        {% endfor %}
+                    {% endif %}
                 </form>
+                {% else %}
+                    <p>Sorry, but you don't have permission to access this page.</p>
+                {% endif %}
             </div>
         </div>
     </div>

@@ -1,6 +1,7 @@
 {% extends 'bookshelf/base.html' %}
 
 {% block content %}
+    {% load filters %}
 
     <div class="container">
         <div class="row">
@@ -9,10 +10,14 @@
                     {% csrf_token %}
                     <div class="card text-center">
                         <div class="card-body">
+                            {% if request.user|has_group:"Librarian" %}
 
-                            <p>Are you sure you want to delete {{ object|title }}?</p>
+                                <p>Are you sure you want to delete {{ object|title }}?</p>
 
-                            <input type="submit" value="Confirm" class="card-link">
+                                <input type="submit" value="Confirm" class="card-link">
+                            {% else %}
+                                <p>Sorry, but you don't have permission to access this page.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </form>

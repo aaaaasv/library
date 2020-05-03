@@ -1,11 +1,9 @@
 from django.db import models
 from django.db.models.signals import post_save, post_init
 from django.core.signals import request_finished
-
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
 
 class Author(models.Model):
     first_name = models.CharField(max_length=50)
@@ -17,12 +15,10 @@ class Author(models.Model):
     def __str__(self):
         return ("%s %s" % (self.last_name, self.first_name))
 
-
 class Book(models.Model):
     title = models.CharField(max_length=100)
     author = models.ForeignKey(Author, on_delete=models.CASCADE, null=True)
     cover = models.CharField(max_length=200, default='static/bookshelf/standard_cover.png')
-
     ISBN = models.CharField(max_length=13, default='0000000000000')
 
     TYPE_CHOICES = [
@@ -32,7 +28,6 @@ class Book(models.Model):
     type = models.CharField(max_length=11,
                             choices=TYPE_CHOICES,
                             default='paperback')
-
     STATUS_CHOICES = [
         ('A', 'Available'),
         ('N', 'Not available'),
@@ -52,7 +47,6 @@ class Book(models.Model):
 class PaperBook(Book):
     total_amount = models.IntegerField(default=1)
     current_amount = models.IntegerField(default=1)
-
     reserved_amount = models.IntegerField(default=0)
 
     borrower = models.ManyToManyField(User, blank=True, related_name='borrowerOfBook')
@@ -93,6 +87,8 @@ class PaperBook(Book):
                     self.status = 'N'
                 else:
                     self.status = 'A'
+        else:
+            self.type = 'paperback'
 
         if self.current_amount > self.total_amount:
             self.current_amount = self.total_amount
@@ -105,7 +101,9 @@ class PaperBook(Book):
 class ElectronicBook(Book):
     file_format = models.CharField(max_length=10, default='')
     link = models.CharField(max_length=100, default='')
-
+    def save(self, *args, **kwargs):
+        self.type = 'electronic'
+        super().save(*args, **kwargs)
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

@@ -1,24 +1,13 @@
 {% extends 'bookshelf/base.html' %}
 {% block title %} Library {% endblock %}
 {% block search %}
+    {% load static %}
+
+    <style>
+
+    </style>
     <div class="row">
         <div class="col d-flex flex-row">
-            {#    <form method="get" class="form-inline my-2 my-lg-0">#}
-            {#        <select name="filterstatus" aria-labelledby="navbarDropdown" class="btn btn-outline-info">#}
-            {#            <option value="" disabled selected>Filter Book Status</option>#}
-            {#            <option value='A'#}
-            {#                    style="background-color:transparent; border:none; cursor:pointer" ; color:black;#}
-            {#                    class="filter-button">Available#}
-            {#            </option>#}
-            {#            <option value='N'#}
-            {#                    style="background-color:transparent; border:none; cursor:pointer; color:black"#}
-            {#                    class=" filter-button">Not Available#}
-            {#            </option>#}
-            {#        </select>#}
-            {#        <input class="form-control mr-sm-2 searchfield" id="searchbox" name="search" type="search"#}
-            {#               value="{{ request.GET.searchit }}" placeholder="Search" aria-label="Search"/>#}
-            {#        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>#}
-            {#    </form>#}
             <form action="" method="get">
                 {% for i in filterset.form %}
                     <div class="badge badge-info text-wrap p-2"
@@ -28,8 +17,9 @@
                     </div>
                     {{ i }}
                 {% endfor %}
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                <button class="btn btn-outline-info my-3 my-sm-0"><a href="{% url 'index' %}">Show all books</a>
+                <button class="btn btn-purp-light my-2 my-sm-0" type="submit">Search</button>
+                <button class="btn my-3 my-sm-0 btn-purp">
+                    <a href="{% url 'index' %}">Show all books</a>
                 </button>
 
             </form>
@@ -38,7 +28,6 @@
 {% endblock %}
 {% block content %}
     {% load filters %}
-    {% load static %}
     {% load tags %}
     <link rel="stylesheet" href="{% static "bookshelf/styles/book_list.css" %}" type="text/css">
     <div class="container-fluid">
@@ -58,22 +47,17 @@
                         {% for book in object_list %}
                             <tr>
                                 <th scope="row">{{ forloop.counter }}</th>
-                                <td><img class="rounded border border-dark" src="{{ book.cover }}" alt=""
-                                         style="max-width:8em; cursor:pointer"></td>
+                                <td><img class="shadow rounded border border-dark shadow" src="{{ book.cover }}"
+                                         alt="static/bookshelf/standard_cover.png"
+                                         style="max-width:8em; cursor:pointer; "></td>
                                 {% if book.type == 'paperback' %}
                                     <td>
-                                        <img
-                                                src="https://image.flaticon.com/icons/png/512/166/166088.png"
-                                                alt="Paperback"
-                                                style="max-width:1.5em"
-                                                title="Paperback">
+                                        <i class="fas fa-book" title="Paper Book"></i>
                                         {{ book.title|title }}</td>
                                 {% else %}
-                                    <td><img
-                                            src="https://image.flaticon.com/icons/svg/2784/2784602.svg"
-                                            alt="eBook"
-                                            style="max-width:1.5em"
-                                            title="eBook">{{ book.title|title }}</td>
+                                    <td><i class="fas fa-mobile-alt" title="eBook"></i>
+
+                                        {{ book.title|title }}</td>
                                 {% endif %}
                                 <td>{{ book.author.first_name|title }} {{ book.author.last_name|title }}</td>
                                 <td style="color:{{ book.status|get_status_color }}">
@@ -96,11 +80,19 @@
                                     {% if request.user|has_group:"Librarian" %}
                                         <div class="btn-group-vertical" role="group" aria-label="Management Panel">
                                         <a type="button" class="btn my-1"
-                                           href="{% url 'book_update' pk=book.pk %}"
-                                           style="background-color:#5F00BA; color:white;">Edit</a>
+                                           href="{% if book.type == 'paperback' %}
+{% url 'book_update' pk=book.pk %}
+{% else %}
+{% url 'ebook_update' pk=book.pk %}
+{% endif %}
+"
+                                           style="background-color:#5F00BA; color:white;">
+                                        Edit
+                                        </a>
                                         <a type="button" class="btn my-1"
                                            href="{% url 'book_delete' pk=book.pk %}"
-                                           style="background-color:#7027C6; color:white;">Remove</a>
+                                           style="background-color:#7027C6; color:white;">Remove
+                                        </a>
                                         {% if book.type == 'paperback' %}
                                             {% if book.paperbook.current_amount > 0 %}
                                                 <a href="{% url 'getcardnumber' book_pk=book.paperbook.pk type='borrow' %}"
@@ -143,9 +135,6 @@
                                     </div>
                                 </td>
                             </tr>
-                        {% empty %}
-                            <p>There are no books yet.</p>
-
                         {% endfor %}
 
 
@@ -153,16 +142,16 @@
                 </div>
             </div>
         </div>
-        {#    TODO: Remove pagination when filtering    #}
+
         {% if is_paginated %}
-            <div class="row my-2">
+            <div class="row my-1">
                 <div class="col-sm-12 text-center">
                     <div class="pagination d-flex flex-column align-items-center">
             <span class="step-links">
             {% if page_obj.has_previous %}
-                <a class="btn btn-outline-success" href="?{% param_replace page=1 %}">&laquo; first</a>
+                <a class="btn btn-purp" href="?{% param_replace page=1 %}">&laquo; first</a>
                 {% if page_obj.previous_page_number != 1 %}
-                    <a class="btn btn-outline-success" href="?{% param_replace page=page_obj.previous_page_number %}">previous</a>
+                    <a class="btn btn-purp" href="?{% param_replace page=page_obj.previous_page_number %}">previous</a>
                 {% endif %}
             {% endif %}
 
@@ -172,9 +161,9 @@
 
                 {% if page_obj.has_next %}
                     {% if page_obj.next_page_number != paginator.num_pages %}
-                        <a class="btn btn-outline-success" href="?{% param_replace page=page_obj.next_page_number %}">next</a>
+                        <a class="btn btn-purp" href="?{% param_replace page=page_obj.next_page_number %}">next</a>
                     {% endif %}
-                    <a class="btn btn-outline-success"
+                    <a class="btn btn-purp"
                        href="?{% param_replace page=paginator.num_pages %}">last &raquo;</a>
                 {% endif %}
             </span>
@@ -187,10 +176,14 @@
         {% if request.user|has_group:"Librarian" %}
             <div class="row">
                 <div class="col-sm-12 text-center">
-                    <a type="button" class="btn btn-success" href="{% url 'book_create' %}">Add book</a>
+                    <a type="button" class="btn" style="background-color:#5F00BA; color:white;"
+                       href="{% url 'book_create' %}">Add paper book</a>
+                    <a type="button" class="btn" style="background-color:#5F00BA; color:white;"
+                       href="{% url 'ebook_create' %}">Add electronic book</a>
                 </div>
 
             </div>
             </div>
         {% endif %}
+    {#    TODO: add footer with some info#}
 {% endblock %}
