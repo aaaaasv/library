@@ -2,7 +2,6 @@ from django import forms
 from django.forms import ModelForm, CharField, TextInput
 from .models import Book, Profile, PaperBook, ElectronicBook
 
-
 class BookEdit(ModelForm):
     class Meta:
         model = PaperBook
@@ -27,7 +26,3 @@ class BorrowerCardNumberForm(forms.Form):
                                                     'placeholder': 'Card number',
                                                     }),
                             label='')
-
-    # class Meta:
-    #     model = Profile
-    #     fields = ['card_number']

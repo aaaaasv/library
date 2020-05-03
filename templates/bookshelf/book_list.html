@@ -1,5 +1,5 @@
 {% extends 'bookshelf/base.html' %}
-{% block title %} Library {% endblock %}
+{% block title %} Book Catalog {% endblock %}
 {% block search %}
     {% load static %}
 
@@ -62,9 +62,13 @@
                                 <td>{{ book.author.first_name|title }} {{ book.author.last_name|title }}</td>
                                 <td style="color:{{ book.status|get_status_color }}">
                                     {% if book.type == 'paperback' %}
-                                        {{ book.get_status_display }}
-                                        {% if book.status == 'A' %}
-                                            ({{ book.paperbook.current_amount }}/{{ book.paperbook.total_amount }})
+                                        {% if book.paperbook.current_amount != 0 %}
+                                            {{ book.get_status_display }}
+                                            {% if book.status == 'A' %}
+                                                ({{ book.paperbook.current_amount }}/{{ book.paperbook.total_amount }})
+                                            {% endif %}
+                                        {% else %}
+                                            <span style="color:red">Not Available</span>
                                         {% endif %}
                                     {% else %}
                                         <p style="color:blue">Electronic</p>
@@ -87,7 +91,7 @@
 {% endif %}
 "
                                            style="background-color:#5F00BA; color:white;">
-                                        Edit
+                                            Edit
                                         </a>
                                         <a type="button" class="btn my-1"
                                            href="{% url 'book_delete' pk=book.pk %}"

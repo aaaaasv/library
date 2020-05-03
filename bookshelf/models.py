@@ -71,7 +71,6 @@ class PaperBook(Book):
             else:
                 reserved_amount = self.reserver.all().count()
                 if reserved_amount > 0:
-                    # TODO: 3 reserved books per user and 3 reservations per book is maximum
                     for i in self.reserver.all():
                         print(i)
                     enough_list = self.reserver.all()[
@@ -83,10 +82,7 @@ class PaperBook(Book):
                     reserved_amount = self.reserver.all().count()
                     self.reserved_amount = reserved_amount
                     self.current_amount = self.total_amount - self.borrower.all().count() - reserved_amount
-                if self.current_amount == 0:
-                    self.status = 'N'
-                else:
-                    self.status = 'A'
+
         else:
             self.type = 'paperback'
 
@@ -96,6 +92,12 @@ class PaperBook(Book):
         if self.current_amount < 0:
             self.current_amount = 0
 
+        if self.current_amount == 0:
+            self.status = 'N'
+        else:
+            self.status = 'A'
+        reserved_amount = self.reserver.all().count()
+        print(reserved_amount)
         super().save(*args, **kwargs)
 
 class ElectronicBook(Book):
