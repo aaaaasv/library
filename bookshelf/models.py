@@ -71,8 +71,7 @@ class PaperBook(Book):
             else:
                 reserved_amount = self.reserver.all().count()
                 if reserved_amount > 0:
-                    for i in self.reserver.all():
-                        print(i)
+                    # for i in self.reserver.all():
                     enough_list = self.reserver.all()[
                                   :self.current_amount]  # slice so that all users will get reserved book and current amount wont be < 0
                     for reserver_user in enough_list:
@@ -96,8 +95,7 @@ class PaperBook(Book):
             self.status = 'N'
         else:
             self.status = 'A'
-        reserved_amount = self.reserver.all().count()
-        print(reserved_amount)
+        self.reserved_amount = self.reserver.all().count()
         super().save(*args, **kwargs)
 
 class ElectronicBook(Book):
