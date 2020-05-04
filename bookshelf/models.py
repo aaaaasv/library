@@ -4,6 +4,7 @@ from django.core.signals import request_finished
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from sortedm2m.fields import SortedManyToManyField
 
 class Author(models.Model):
     first_name = models.CharField(max_length=50)
@@ -50,7 +51,7 @@ class PaperBook(Book):
     reserved_amount = models.IntegerField(default=0)
 
     borrower = models.ManyToManyField(User, blank=True, related_name='borrowerOfBook')
-    reserver = models.ManyToManyField(User, blank=True, related_name='reserverOfBook')
+    reserver = SortedManyToManyField(User, blank=True, related_name='reserverOfBook')
 
     def save(self, *args, **kwargs):
         """
