@@ -1,6 +1,9 @@
 from django.urls import path, include
 from bookshelf.views import *
 
+handler404 = handler404
+
+
 urlpatterns = [
     path('', BookListView.as_view(), name='index'),
     path('book/<int:pk>/update', BookUpdate.as_view(), name='book_update'),
@@ -14,6 +17,6 @@ urlpatterns = [
     # path('borrowerbooks/<int:pk>/', BorrowerDetailView.as_view(), name='borrower_detail'),
     path('<int:book_pk>/<str:type>/', bookborrow_getcardnumber, name='getcardnumber'), #'book_borrow'),
     path('borrowerbooks/<int:user_id>/<str:type>/<int:book_pk>/', borrowerbooklist, name='borrower_detail'),
-    # path('user/<int:user_pk>/borrow_book/<int:book_pk>', BookBorrow.as_view(), name='book_borrow')
+    # path('user/<int:user_pk>/borrow_book/<int:book_pk>', BookBorrow.as_view(), name='book_borrow'),
 ]
 
