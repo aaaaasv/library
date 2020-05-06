@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class='h-100'>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -9,10 +9,26 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     {% load static %}
-</head>
-<body>
+        <style>
+        a, a:hover, a:focus, a:active {
+            text-decoration: none;
+            color: inherit;
+        }
 
-<img src="{% static '/bookshelf/standard_cover.png' %}" alt="123">
+    </style>
+</head>
+<body class='h-100'>
+<div class='container h-100'>
+    <div class ='row text-center h-100 my-auto'>
+        <div class='col-12 align-self-center'>
+            <h2 style='font-size:2em'><a href='{% url 'index' %}'>Back To The Library</a></h2>
+<img src="{% static '/bookshelf/404.png' %}" alt="404 Not Found" style='max-width:10em;'>
+<h1 style='font-size:3.5em;'>404 Not Found</h1>
+</div>
+</div>
+
+
+</div>
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
         integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
         crossorigin="anonymous"></script>

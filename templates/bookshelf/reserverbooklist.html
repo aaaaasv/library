@@ -20,7 +20,9 @@
                         <form method="post">
                         {% csrf_token %}
                         {% for i in to_reserve %}
-                            <input type="submit" value="Confirm book ({{ i.title|title }}) reserving">
+{#                            <input type="submit" value="Confirm book ({{ i.title|title }}) reserving">#}
+             <input type="submit" value="Confirm book ({{ i.title|title }}) reserving" class="card-link btn" style="background-color:#5F00BA; color:white;"></input>
+
                         {% endfor %}
                     {% endif %}
                 </form>

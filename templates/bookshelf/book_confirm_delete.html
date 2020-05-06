@@ -14,7 +14,9 @@
 
                                 <p>Are you sure you want to delete {{ object|title }}?</p>
 
-                                <input type="submit" value="Confirm" class="card-link">
+{#                                <input type="submit" value="Confirm" class="card-link">#}
+                        <input type="submit" value="Confirm" class="card-link btn" style="background-color:#5F00BA; color:white;"></input>
+
                             {% else %}
                                 <p>Sorry, but you don't have permission to access this page.</p>
                             {% endif %}
