@@ -48,7 +48,8 @@
                             <tr>
                                 <th scope="row">{{ forloop.counter }}</th>
                                 <td><img class="shadow rounded border border-dark shadow" src="{{ book.cover }}"
-                                         alt="static/bookshelf/standard_cover.png"
+                                         alt="{% static '/bookshelf/standard_cover.png' %}"
+
                                          style="max-width:8em; cursor:pointer; "></td>
                                 {% if book.type == 'paperback' %}
                                     <td>

@@ -1,0 +1,53 @@
+.btn-4 {
+    background-color: #0e1071;
+    color: white;
+}
+
+.btn-4:hover {
+    color: white;
+    background-color: #0e105c;
+}
+
+a {
+    text-decoration: none !important;
+}
+
+.filter-button {
+    background: none;
+
+    text-align: center;
+    outline: none;
+}
+
+.filter-button:active {
+    border-style: outset;
+}
+
+.btn-purp:hover {
+    background-color: #7027C6;
+    color: white;
+}
+
+.btn-purp {
+    border-color: #7027C6;
+    color: #7027C6;
+}
+
+.btn-purp-light:hover {
+    background-color: #A09BE7;
+    color: white;
+}
+
+.btn-purp-light {
+    border-color: #A09BE7;
+    color: #A09BE7;
+}
+
+.shadow:hover {
+    border-color: gray !important;
+    transition: 1s;
+}
+.shadow {
+    border-color: black !important;
+    transition: 1s;
+}

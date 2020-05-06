@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 't68yqh@xfjr0b#e5bwt+329*u$55lm$kc!433#wu4%b3ggf=+)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
@@ -132,9 +132,15 @@ USE_TZ = True
 # ]
 
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_URL = '/static/'
 
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/') # after collectstatic saves here
+STATICFILES_DIRS = ("bookshelf\\static", )
 STATIC_URL = '/static/'
+
+
 
 # STATICFILES_DIRS = [
 #     os.path.join(BASE_DIR, "static"),
