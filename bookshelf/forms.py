@@ -5,19 +5,22 @@ from .models import Book, Profile, PaperBook, ElectronicBook
 class BookEdit(ModelForm):
     class Meta:
         model = PaperBook
-        # fields = '__all__'
-        exclude = ['type']
+        exclude = ('type', 'borrower', 'reserver', 'reserved_amount', 'status')
 
 class EBookEdit(ModelForm):
     class Meta:
         model = ElectronicBook
-        exclude = ('type', 'status', 'file_format', 'link')
-        # fields = '__all__'
+        exclude = ('type', 'status')
 
 class EBookCreate(ModelForm):
     class Meta:
         model = ElectronicBook
         exclude = ('type', 'status')
+
+class BookCreate(ModelForm):
+    class Meta:
+        model = PaperBook
+        exclude = ('type', 'borrower', 'reserver', 'reserved_amount', 'status')
 
 
 class BorrowerCardNumberForm(forms.Form):

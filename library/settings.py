@@ -108,10 +108,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-# LANGUAGES = [
-#   ('uk', _('Ukrainian')),
-#   ('en', _('English')),
-# ]
 
 TIME_ZONE = 'UTC'
 
@@ -130,15 +126,6 @@ STATIC_URL = '/static/'
 
 # STATIC_URL = '/static/' # deployment static setup
 # STATIC_ROOT = '/home/librarym/library/static'
-
-
-
-
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, "static"),
-#     # '/var/www/static/',
-#     # '/home/mylibraryc/library/bookshelf/static',
-# ]
 
 
 LOGIN_REDIRECT_URL = "/"

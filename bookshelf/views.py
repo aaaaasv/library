@@ -12,7 +12,7 @@ from django.contrib.auth.forms import UserCreationForm
 import django_filters
 
 from .models import Book, Profile, ElectronicBook, PaperBook
-from .forms import BookEdit, EBookEdit, BorrowerCardNumberForm, EBookCreate
+from .forms import BookEdit, EBookEdit, BorrowerCardNumberForm, EBookCreate, BookCreate
 
 from django.db.models.functions import Concat
 
@@ -68,14 +68,13 @@ class EBookUpdate(UpdateView):
     form_class = EBookEdit
     template_name = 'bookshelf/book_form.html'
 
-
     def get_success_url(self):
         return reverse('index')
 
 
 class BookCreate(CreateView):
     model = PaperBook
-    fields = '__all__'
+    form_class = BookCreate
     success_url = '/'
     template_name_suffix = '_create_form'
 
@@ -114,7 +113,6 @@ def borrowerbooklist(request, user_id, book_pk, type):
                 show_error_message(request, "Book limit reached (>5)")
             else:
                 b.borrower.add(u)
-
                 boooks = PaperBook.objects.get(pk=book_pk)
                 amount_of_borrowers = boooks.borrower.all().count()
                 total_amount_books = PaperBook.objects.all().filter(pk=book_pk).values()[0]['total_amount']
@@ -170,19 +168,10 @@ def borrowerbooklist(request, user_id, book_pk, type):
             book_obj.borrower.remove(user_obj)
             book_obj.save()  # to make all amounts correct
         elif user.values()[0] in PaperBook.objects.get(pk=book_pk).reserver.all().values():
-            # TODO: remove user from borrowers or reservers and check if Book model saves correct amount
             pass
         else:  # user did not borrow the book
             show_error_message(request, "This user did not borrow the book")
         return redirect('/')
-
-
-class BookBorrow(DetailView):
-    # model = user
-    fields = '__all__'
-
-    def get_success_url(self):
-        return reverse('index')
 
 
 from django.contrib import messages
@@ -190,7 +179,6 @@ from django.contrib import messages
 
 def show_error_message(request, message):
     messages.info(request, message)
-
 
 def bookborrow_getcardnumber(request, book_pk, type):
     context = {}
@@ -202,7 +190,6 @@ def bookborrow_getcardnumber(request, book_pk, type):
             card_number = form.cleaned_data['card_number']
             if len(card_number) != 9:
                 show_error_message(request, 'Inputted card number is not correct. Try again.')
-                # return redirect('/')
             try:  # check if there is a user with inputted card number
                 borrower_profile = Profile.objects.all().filter(card_number=card_number).values()
                 borrower_user = User.objects.all().filter(profile=borrower_profile[0]['id']).values()
@@ -211,7 +198,6 @@ def bookborrow_getcardnumber(request, book_pk, type):
                 show_error_message(request, 'User with card number {} does not exist'.format(card_number))
     else:
         form = BorrowerCardNumberForm()
-
     context['form'] = form
     return render(request, 'bookshelf/bookborrow_getcardnumber.html', context)
 

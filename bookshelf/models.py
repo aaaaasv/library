@@ -42,8 +42,6 @@ class Book(models.Model):
     def __str__(self):
         return ("%s %s. %s" % (self.title, self.author.first_name[:1], self.author.last_name))
 
-    # class Meta:
-    #     abstract = True
 
 class PaperBook(Book):
     total_amount = models.IntegerField(default=1)
@@ -57,9 +55,7 @@ class PaperBook(Book):
         """
         When zero books are available, automatically change its status to - 'Not available';
         When > 0 books are available, change its status to - 'Available'
-        :param args:
-        :param kwargs:
-        :return:
+        Lend book to reservee when it becomes available
         """
         if self.type == 'paperback':
             try:
@@ -72,7 +68,6 @@ class PaperBook(Book):
             else:
                 reserved_amount = self.reserver.all().count()
                 if reserved_amount > 0:
-                    # for i in self.reserver.all():
                     enough_list = self.reserver.all()[
                                   :self.current_amount]  # slice so that all users will get reserved book and current amount wont be < 0
                     for reserver_user in enough_list:
@@ -82,7 +77,6 @@ class PaperBook(Book):
                     reserved_amount = self.reserver.all().count()
                     self.reserved_amount = reserved_amount
                     self.current_amount = self.total_amount - self.borrower.all().count() - reserved_amount
-
         else:
             self.type = 'paperback'
 
@@ -102,6 +96,7 @@ class PaperBook(Book):
 class ElectronicBook(Book):
     file_format = models.CharField(max_length=10, default='')
     link = models.CharField(max_length=100, default='')
+
     def save(self, *args, **kwargs):
         self.type = 'electronic'
         super().save(*args, **kwargs)

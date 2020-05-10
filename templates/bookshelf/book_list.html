@@ -41,7 +41,6 @@
                         <th scope="col">Title</th>
                         <th scope="col">Author</th>
                         <th scope="col">Status</th>
-                        {#                        <th scope="col">Shelf</th>#}
                         <th scope="col"></th>
                         </thead>
                         {% for book in object_list %}
@@ -53,7 +52,7 @@
                                          style="max-width:8em; cursor:pointer; "></td>
                                 {% if book.type == 'paperback' %}
                                     <td>
-                                        <i class="fas fa-book" title="Paper Book"></i>
+                                        <i class="fas fa-book" title="Paperback"></i>
                                         {{ book.title|title }}</td>
                                 {% else %}
                                     <td><i class="fas fa-mobile-alt" title="eBook"></i>
@@ -75,7 +74,6 @@
                                         <p style="color:blue">Electronic</p>
                                     {% endif %}
                                 </td>
-                                {#                                <td>None</td>#}
                                 <style>
 
                                 </style>
@@ -176,13 +174,11 @@
                 </div>
             </div>
         {% endif %}
-
-
         {% if request.user|has_group:"Librarian" %}
             <div class="row">
                 <div class="col-sm-12 text-center">
                     <a type="button" class="btn" style="background-color:#5F00BA; color:white;"
-                       href="{% url 'book_create' %}">Add paper book</a>
+                       href="{% url 'book_create' %}">Add paperback</a>
                     <a type="button" class="btn" style="background-color:#5F00BA; color:white;"
                        href="{% url 'ebook_create' %}">Add electronic book</a>
                 </div>
@@ -190,5 +186,4 @@
             </div>
             </div>
         {% endif %}
-    {#    TODO: add footer with some info#}
 {% endblock %}

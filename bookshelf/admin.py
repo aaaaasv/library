@@ -32,8 +32,6 @@ class AuthorResource(resources.ModelResource):
 class AuthorAdmin(ImportExportModelAdmin):
     resource_class = AuthorResource
 
-
-# admin.site.register(Book, BookAdmin)
 admin.site.register(Author, AuthorAdmin)
 admin.site.register(Profile)
 admin.site.register(PaperBook, PBookAdmin)

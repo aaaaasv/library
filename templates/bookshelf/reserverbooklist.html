@@ -7,8 +7,6 @@
         <div class="row align-items-center">
             <div class="col text-center">
                 {% if request.user|has_group:"Librarian" %}
-
-
                     {% for i in reserver %}
                         <h4>{{ i.username }}</h4>
                     {% endfor %}
@@ -20,7 +18,6 @@
                         <form method="post">
                         {% csrf_token %}
                         {% for i in to_reserve %}
-{#                            <input type="submit" value="Confirm book ({{ i.title|title }}) reserving">#}
              <input type="submit" value="Confirm book ({{ i.title|title }}) reserving" class="card-link btn" style="background-color:#5F00BA; color:white;"></input>
 
                         {% endfor %}
