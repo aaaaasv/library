@@ -50,6 +50,7 @@ class PaperBook(Book):
 
     borrower = models.ManyToManyField(User, blank=True, related_name='borrowerOfBook')
     reserver = SortedManyToManyField(User, blank=True, related_name='reserverOfBook')
+    to_giveout = models.ManyToManyField(User, blank=True, related_name='toGiveOut')
 
     def save(self, *args, **kwargs):
         """
@@ -72,6 +73,7 @@ class PaperBook(Book):
                                   :self.current_amount]  # slice so that all users will get reserved book and current amount wont be < 0
                     for reserver_user in enough_list:
                         self.borrower.add(reserver_user)  # set user who is now reserver to borrower
+                        self.to_giveout.add(reserver_user)
                         self.reserver.remove(reserver_user)  # remove user from reserver (because moved to borrower)
                     super().save(*args, **kwargs)
                     reserved_amount = self.reserver.all().count()

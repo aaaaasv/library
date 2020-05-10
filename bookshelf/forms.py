@@ -20,7 +20,7 @@ class EBookCreate(ModelForm):
 class BookCreate(ModelForm):
     class Meta:
         model = PaperBook
-        exclude = ('type', 'borrower', 'reserver', 'reserved_amount', 'status')
+        exclude = ('type', 'borrower', 'reserver', 'reserved_amount', 'status', 'to_giveout')
 
 
 class BorrowerCardNumberForm(forms.Form):
