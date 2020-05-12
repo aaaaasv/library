@@ -1,6 +1,7 @@
 {% extends 'bookshelf/base.html' %}
 {% block title %} Who borrowed {{ book|title }} {% endblock %}
 {% block content %}
+    {% load filters %}
     <div class="container">
         <div class="row">
             <div class="col text-center">
@@ -25,7 +26,11 @@
                         {% for i in book.paperbook.borrower.all %}
                             <tr>
                                 <th scope="row">{{ forloop.counter }}</th>
-                                <td>{{ i.username }}</td>
+                                <td>{{ i.username }}
+                                {% if i.id|has_reserved:book %}
+                                    (R)
+                                    {% endif %}
+                                </td>
                                 <td>{{ i.first_name }}</td>
                                 <td>{{ i.last_name }}</td>
                                 <td>{{ i.email }}</td>
