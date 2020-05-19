@@ -54,7 +54,7 @@ class PaperBook(Book):
 
     def save(self, *args, **kwargs):
         """
-        When zero books are available, automatically change its status to - 'Not available';
+        When zero books are available, change its status to - 'Not available';
         When > 0 books are available, change its status to - 'Available'
         Lend book to reservee when it becomes available
         """

@@ -77,6 +77,12 @@ class BookCreate(CreateView):
     form_class = BookCreate
     success_url = '/'
     template_name_suffix = '_create_form'
+    def form_valid(self, form):
+        self.object = form.save()
+        if self.object.current_amount > self.object.total_amount:
+            self.object.current_amount = self.object.total_amount
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class EBookCreate(CreateView):
@@ -84,6 +90,8 @@ class EBookCreate(CreateView):
     form_class = EBookCreate
     success_url = '/'
     template_name = 'bookshelf/paperbook_create_form.html'
+
+
 
 
 class BookDelete(DeleteView):

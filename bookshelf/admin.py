@@ -1,8 +1,9 @@
 from django.contrib import admin
-from bookshelf.models import Book, Author, Profile, ElectronicBook, PaperBook
-
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
+
+from bookshelf.models import Book, Author, Profile, ElectronicBook, PaperBook
+
 
 class PBookResource(resources.ModelResource):
     class Meta:
