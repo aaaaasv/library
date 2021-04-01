@@ -1,11 +1,9 @@
-from django.shortcuts import render
 from django.views.generic.list import ListView
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views.generic.edit import UpdateView, CreateView, DeleteView
 from django.views.generic.detail import DetailView
 from django.urls import reverse
-from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
@@ -14,12 +12,10 @@ import django_filters
 from .models import Book, Profile, ElectronicBook, PaperBook
 from .forms import BookEdit, EBookEdit, BorrowerCardNumberForm, EBookCreate, BookCreate
 
-from django.db.models.functions import Concat
 
 def handler404(request, exception, template_name="404.html"):
-    response = render_to_response(template_name)
-    response.status_code = 404
-    return response
+    return render(request, template_name=template_name)
+
 
 class BookFilter(django_filters.FilterSet):
     def __init__(self, data, *args, **kwargs):
@@ -76,6 +72,7 @@ class BookCreate(CreateView):
     form_class = BookCreate
     success_url = '/'
     template_name_suffix = '_create_form'
+
     def form_valid(self, form):
         self.object = form.save()
         if self.object.current_amount > self.object.total_amount:
@@ -184,6 +181,7 @@ from django.contrib import messages
 
 def show_error_message(request, message):
     messages.info(request, message)
+
 
 def bookborrow_getcardnumber(request, book_pk, type):
     context = {}
